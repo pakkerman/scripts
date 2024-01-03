@@ -41,6 +41,8 @@ const ADtailerFields = {
 }
 
 function run() {
+  hideViolationSpan()
+
   const pane = document.querySelectorAll('.n-tab-pane:not([class*=" "])')
   let selectedPane = ''
   pane.forEach((item) => {
@@ -103,5 +105,12 @@ function toggleOpenMoreSettings() {
   const toggle = document.querySelectorAll('[icon-id="arrowup"]')
   toggle.forEach((item) => {
     if (!item.classList.contains('rotate-180')) item.click()
+  })
+}
+
+function hideViolationSpan() {
+  // hide span
+  document.querySelectorAll('span').forEach((item) => {
+    if (item.classList.value.includes('c-#E88080')) item.classList.add('hidden')
   })
 }

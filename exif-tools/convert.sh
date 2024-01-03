@@ -2,23 +2,26 @@
 
 [ ! -d "$1" ] && echo "Directory not found." && exit 1
 
-dir="$(dirname "$0")"
-directory="$1"
+working_dir="$(dirname "$0")"
+target_dir="$1"
 
-working_dir=$(dirname "$0")
-target_dir=$(dirname "$1")
-target_base=$(basename "$1")
+# check if pngs is already in the png folder, move it out if so
+files=("$target_dir"/*.png)
+[ ${#files[@]} -eq 1 ] &&
+for png in "$target_dir"/png/*.png ; do
+    mv "$png" "$target_dir"
+done
 
 # rename files
 echo "Renaming all files"
 "$working_dir"/renamePNGs.sh "$1"
 
-
 echo "Generate new metadata..."
-files=("$directory"/*.png)
-count=1
+files=("$target_dir"/*.png)
+count=0
 for png in "${files[@]}"; do
-    [ ! -f "$png" ] && continue
+    [ ! -f "$png" ] && break
+    ((count++))
     
     # convert to jpg and crop bottom 30px to get rid of the watermark
     jpg="${png%.*}.jpg"
@@ -26,13 +29,13 @@ for png in "${files[@]}"; do
     # convert "$png" -quality 95 "$jpg"
     
     # Civitai.com API, model lookup
-    models=$("$dir"/get-models.sh "$png")
+    models=$("$working_dir"/get-models.sh "$png")
     echo "processing $(basename "$png") ($count / ${#files[@]})"
     echo -e "$models" | jq -r '.[] | (.type | select(. == "Checkpoint") |= "CKPT") + "\t: " + .name' | awk '{ if (length($0) > 45) print substr($0, 1, 45) "..."; else print }'
     echo "-"
     
     # get comment
-    json_string=$("$dir"/get-comment.sh "$png")
+    json_string=$("$working_dir"/get-comment.sh "$png")
     
     # parse comment
     user_comment=$(
@@ -53,25 +56,34 @@ for png in "${files[@]}"; do
     
     exiv2 -M "set Exif.Photo.UserComment $user_comment $parsedModelInfo" "$jpg"
     
-    ((count++))
 done
 
 echo "Processing complete, Updated ${#files[@]} files."
 
 
-# move jpg to another directory
-jpgs=("$directory"/*.jpg)
-mkdir "$directory"/jpg
-for jpg in "${jpgs[@]}"; do
-    mv "$jpg" "$directory"/jpg
-done
+# move jpg to another target_dir
+# jpgs=("$target_dir"/*.jpg)
+# mkdir "$target_dir"/jpg
+# for jpg in "${jpgs[@]}"; do
+#     mv "$jpg" "$target_dir"/jpg
+# done
+
 
 
 # make slides
-read -rp "Make slides? (Y/n)" confirm
-case "$confirm" in
-    [yY] | [yY][eE][sS] | "" ) echo "Continuing (y)" ;;
-    [nN] | [nN][oO]) echo "Canceled (n)" ; exit ;;
-    *) echo "Invalid input."; exit ;;
-esac
-"$dir"/make-slides.sh "$1"
+# read -rp "Make slides? (Y/n)" confirm
+# case "$confirm" in
+#     [yY] | [yY][eE][sS] | "" ) echo "Continuing (y)" ;;
+#     [nN] | [nN][oO]) echo "Canceled (n)" ; exit ;;
+#     *) echo "Invalid input."; exit ;;
+# esac
+
+"$working_dir"/make-slides.sh "$1"
+
+
+pngs=("$target_dir"/*.png)
+mkdir "$target_dir"/png
+for png in "${pngs[@]}"
+do
+    mv "$png" "$target_dir"/png
+done
