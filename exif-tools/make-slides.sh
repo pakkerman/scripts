@@ -14,23 +14,18 @@ count=$(find "$1" -type f -name "*.jpg" | grep -c "")
 # normal output
 # ffmpeg -y -framerate 2 -i "$input" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
 
-text="'%{eif\:trunc(n+1)\:d}\/$count'"
-color="white"
-size="48"
-Y="th-10"
-X="(w-text_w)-10"
 # output with slide number
 ffmpeg -y -framerate 2 -i "$input" \
 -vf \
 "
-  drawtext=text=$text:
-  fontcolor=$color:
-  fontsize=$size:
-  box=1:
-  boxcolor=black@0.5:
-  boxborderw=5:
-  x=$X:
-  y=$Y
+  drawtext=text='%{eif\:trunc(n+1)\:d}\/$count'
+  :fontcolor=white
+  :fontsize=48
+  :box=1
+  :boxcolor=black@0.5
+  :boxborderw=5
+  :x=(w-text_w)-10
+  :y=th-10
 " -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
 
 echo "count $count"
