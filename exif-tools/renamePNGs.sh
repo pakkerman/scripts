@@ -16,15 +16,15 @@ cd "$path" || exit 1
 [ $? -ne 0 ] && echo "The user canceled the dialog or the script returned an empty value." && exit 1
 
 
-read -rp "Rename files in \"$base\" ? (y/n)" confirm
-case "$confirm" in
-    [yY] | [yY][eE][sS] | "" ) echo "Continuing (y)" ;;
-    [nN] | [nN][oO]) echo "Canceled (n)" ; exit ;;
-    *) echo "Invalid input."; exit ;;
-esac
+# read -rp "Rename files in \"$base\" ? (y/n)" confirm
+# case "$confirm" in
+#     [yY] | [yY][eE][sS] | "" ) echo "Continuing (y)" ;;
+#     [nN] | [nN][oO]) echo "Canceled (n)" ; exit ;;
+#     *) echo "Invalid input."; exit ;;
+# esac
 
 
-read -rp "Set prefix (press enter to use folder as the prefix):  " prefix
+# read -rp "Set prefix (press enter to use folder as the prefix):  " prefix
 case "$prefix" in
     "") fileprefix=$base- ;;
     *) fileprefix="$prefix-" ;;
