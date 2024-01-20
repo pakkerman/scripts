@@ -27,14 +27,14 @@ function clickGenerate() {
 
 const upscalerFields = {
   高清修复采样次数: 15,
-  重绘噪声强度: 0.3,
-  采样次数: 1,
+  重绘噪声强度: 0.35,
+  采样次数: 15,
   '提示词相关性(CFG Scale)': 7,
   models: ['DPM++ SDE Karras', 'R-ESRGAN 4x+ Anime6B'],
 }
 
 const ADtailerFields = {
-  重绘噪声强度: 0.4,
+  重绘噪声强度: 0.35,
   采样次数: 10,
   '提示词相关性(CFG Scale)': 7,
   models: ['face_yolov8n_v2.pt', 'DPM++ SDE Karras'],
