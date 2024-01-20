@@ -12,20 +12,21 @@ output="$dir/video-$base.mp4"
 count=$(find "$1" -type f -name "*.jpg" | grep -c "")
 
 # normal output
-# ffmpeg -y -framerate 2 -i "$input" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
+ffmpeg -y -framerate 2 -i "$input" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
 
 # output with slide number
-ffmpeg -y -framerate 2 -i "$input" \
--vf \
-"
-  drawtext=text='%{eif\:trunc(n+1)\:d}\/$count'
-  :fontcolor=white
-  :fontsize=48
-  :box=1
-  :boxcolor=black@0.5
-  :boxborderw=5
-  :x=(w-text_w)-10
-  :y=th-10
-" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
+# ffmpeg -y -framerate 2 -i "$input" \
+# -vf \
+# "
+#   drawtext=text='%{eif\:trunc(n+1)\:d}\/$count'
+#   :fontcolor=#FED7AA
+#   :fontfile=/Users/pakk/Library/Fonts/RobotoMono-Light.ttf
+#   :fontsize=48
+#   :box=1
+#   :boxcolor=black@0.5
+#   :boxborderw=5
+#   :x=(w-text_w)-10
+#   :y=th-10
+# " -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
 
 echo "count $count"
