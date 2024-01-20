@@ -5,7 +5,7 @@
 working_dir="$(dirname "$0")"
 target_dir="$1"
 
-# check if pngs is already in the png folder, move it out if so
+# check if pngs is already in the png folder, move it out
 files=("$target_dir"/*.png)
 [ ${#files[@]} -eq 1 ] &&
 for png in "$target_dir"/png/*.png ; do
@@ -78,7 +78,7 @@ echo "Processing complete, Updated ${#files[@]} files."
 #     *) echo "Invalid input."; exit ;;
 # esac
 
-"$working_dir"/make-slides.sh "$1"
+# "$working_dir"/make-slides.sh "$1"
 
 
 pngs=("$target_dir"/*.png)
