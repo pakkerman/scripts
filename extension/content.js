@@ -17,6 +17,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 })
 
+document.addEventListener('DOMContentLoaded', () =>
+  console.log('LOADDDDDEDED DOCUMENT')
+)
+
+window.addEventListener('load', () => console.log('LOADDDDDEDED WINDOW'))
+
 function clickGenerate() {
   document.querySelectorAll('button').forEach((item) =>
     item.querySelectorAll('*').forEach((subitem) => {
@@ -42,6 +48,7 @@ const ADtailerFields = {
 
 function run() {
   hideViolationSpan()
+  addEventToDeleteButton()
 
   const pane = document.querySelectorAll('.n-tab-pane:not([class*=" "])')
   let selectedPane = ''
@@ -113,4 +120,53 @@ function hideViolationSpan() {
   document.querySelectorAll('span').forEach((item) => {
     if (item.classList.value.includes('c-#E88080')) item.classList.add('hidden')
   })
+}
+
+// const observer = new MutationObserver((m) => {
+//   console.log('observer trigger')
+//   // hideViolationSpan()
+// })
+
+// observer.observe(document.body, {
+//   childList: true,
+//   subtree: true,
+//   attributes: true,
+//   childList: true,
+//   characterData: true,
+// })
+
+function addEventToDeleteButton() {
+  document.querySelectorAll('[icon-id=delete').forEach((item) => {
+    item.addEventListener('click', async () => {
+      console.log('delete clicked')
+      const confirm = await getConfirmButton()
+      confirm[1].click()
+      console.log('return from observer', confirm)
+    })
+  })
+
+  function getConfirmButton() {
+    return new Promise((resolve, reject) => {
+      const observer = new MutationObserver((m) => {
+        console.log(m)
+        const elements = document.querySelectorAll('span.n-button__content')
+        if (elements) observer.disconnect()
+        resolve(elements)
+      })
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        childList: true,
+        characterData: true,
+      })
+    })
+  }
+
+  //   setTimeout(() => {
+  //     document.querySelectorAll('span.n-button__content').forEach((item) => {
+  //       if (item.textContent != '删除') return
+  //       // item.click()
+  //     })
+  //   }, 200)
 }
