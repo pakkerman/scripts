@@ -28,7 +28,7 @@ function clickGenerate() {
 const upscalerFields = {
   高清修复采样次数: 15,
   重绘噪声强度: 0.35,
-  采样次数: 15,
+  采样次数: 1,
   '提示词相关性(CFG Scale)': 7,
   models: ['DPM++ SDE Karras', 'R-ESRGAN 4x+ Anime6B'],
 }
