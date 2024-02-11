@@ -1,5 +1,9 @@
 // one click download
-// document.querySelectorAll('[icon-id=download]:not(.vi-button__icon__size)').forEach((item, idx)=> setTimeout(()=>{item.click()}, 500 * idx))
+
+// click reaction buttons
+// const buttons = [... document.querySelectorAll('.mantine-UnstyledButton-root.mantine-Button-root')]
+// buttons.filter(item => item.querySelector('span').textContent === '👍0').forEach(item=> item.click())
+// buttons.filter(item => item.querySelector('span').textContent === '❤️0').forEach(item=> item.click())
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`message ${message} received`)
@@ -10,6 +14,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     case 'generate':
       clickGenerate()
+      break
+
+    case 'download':
+      download()
       break
 
     default:
@@ -56,6 +64,13 @@ function run() {
     if (item.style.display != '') return
     selectedPane = item.querySelector('h3').textContent
   })
+
+  // expend upscaler and Adetailer
+  document
+    .querySelectorAll('div.n-switch__rail')
+    .forEach((item) => item.click())
+  // click the same seed number
+  document.querySelectorAll('span.c-main.cursor-pointer')[0].click()
 
   toggleOpenMoreSettings()
   if (selectedPane === '高清修复') {
@@ -122,38 +137,16 @@ function hideViolationSpan() {
   })
 }
 
-// const observer = new MutationObserver((m) => {
-//   console.log('observer trigger')
-//   // hideViolationSpan()
-// })
-
-// observer.observe(document.body, {
-//   childList: true,
-//   subtree: true,
-//   attributes: true,
-//   childList: true,
-//   characterData: true,
-// })
+const confirmButtonObserver = new MutationObserver(() => {
+  const elements = document.querySelectorAll('span.n-button__content')
+  elements[1].click()
+  confirmButtonObserver.disconnect()
+})
 
 function addEventToDeleteButton() {
   document.querySelectorAll('[icon-id=delete').forEach((item) => {
-    item.addEventListener('click', async () => {
-      console.log('delete clicked')
-      const confirm = await getConfirmButton()
-      confirm[1].click()
-      console.log('return from observer', confirm)
-    })
-  })
-
-  function getConfirmButton() {
-    return new Promise((resolve, reject) => {
-      const observer = new MutationObserver((m) => {
-        console.log(m)
-        const elements = document.querySelectorAll('span.n-button__content')
-        if (elements) observer.disconnect()
-        resolve(elements)
-      })
-      observer.observe(document.body, {
+    item.addEventListener('click', () => {
+      confirmButtonObserver.observe(document.body, {
         childList: true,
         subtree: true,
         attributes: true,
@@ -161,12 +154,17 @@ function addEventToDeleteButton() {
         characterData: true,
       })
     })
-  }
+  })
+}
 
-  //   setTimeout(() => {
-  //     document.querySelectorAll('span.n-button__content').forEach((item) => {
-  //       if (item.textContent != '删除') return
-  //       // item.click()
-  //     })
-  //   }, 200)
+function download() {
+  console.log('clicked download')
+  document
+    .querySelectorAll('[icon-id=download]:not(.vi-button__icon__size)')
+    .forEach((item, idx) => {
+      setTimeout(() => {
+        item.click()
+        console.log(`downloading: ${idx + 1}`)
+      }, 500 * idx)
+    })
 }
