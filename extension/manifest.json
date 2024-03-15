@@ -29,7 +29,6 @@
       "128": "images/icon-128.png"
     }
   },
-
   "commands": {
     "_execute_action": {
       "suggested_key": {
@@ -41,6 +40,18 @@
         "default": "Alt+Shift+A"
       },
       "description": "click the generate button"
+    },
+    "download": {
+      "suggested_key": {
+        "default": "Alt+Shift+D"
+      },
+      "description": "click the download button"
+    },
+    "createProject": {
+      "suggested_key": {
+        "default": "Alt+Shift+C"
+      },
+      "description": "fill in create project"
     }
   },
 
