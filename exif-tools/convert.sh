@@ -8,9 +8,9 @@ target_dir="$1"
 # check if pngs is already in the png folder, move it out
 files=("$target_dir"/*.png)
 [ ${#files[@]} -eq 1 ] &&
-for png in "$target_dir"/png/*.png ; do
-    mv "$png" "$target_dir"
-done
+	for png in "$target_dir"/png/*.png; do
+		mv "$png" "$target_dir"
+	done
 
 # rename files
 echo "Renaming all files"
@@ -20,27 +20,27 @@ echo "Generate new metadata..."
 files=("$target_dir"/*.png)
 count=0
 for png in "${files[@]}"; do
-    [ ! -f "$png" ] && break
-    ((count++))
-    
-    # convert to jpg and crop bottom 30px to get rid of the watermark
-    jpg="${png%.*}.jpg"
-    convert "$png" -gravity South -chop 0x30 -quality 95 "$jpg"
-    # convert "$png" -quality 95 "$jpg"
-    
-    # Civitai.com API, model lookup
-    models=$("$working_dir"/get-models.sh "$png")
-    echo "processing $(basename "$png") ($count / ${#files[@]})"
-    echo -e "$models" | jq -r '.[] | (.type | select(. == "Checkpoint") |= "CKPT") + "\t: " + .name' | awk '{ if (length($0) > 45) print substr($0, 1, 45) "..."; else print }'
-    echo "-"
-    
-    # get comment
-    json_string=$("$working_dir"/get-comment.sh "$png")
-    
-    # parse comment
-    user_comment=$(
-        echo "$json_string" |\
-        jq -r '
+	[ ! -f "$png" ] && break
+	((count++))
+
+	# convert to jpg and crop bottom 30px to get rid of the watermark
+	jpg="${png%.*}.jpg"
+	convert "$png" -gravity South -chop 0x30 -quality 95 "$jpg"
+	# convert "$png" -quality 95 "$jpg"
+
+	# Civitai.com API, model lookup
+	models=$("$working_dir"/get-models.sh "$png")
+	echo "processing $(basename "$png") ($count / ${#files[@]})"
+	echo -e "$models" | jq -r '.[] | (.type | select(. == "Checkpoint") |= "CKPT") + "\t: " + .name' | awk '{ if (length($0) > 45) print substr($0, 1, 45) "..."; else print }'
+	echo "-"
+
+	# get comment
+	json_string=$("$working_dir"/get-comment.sh "$png")
+
+	# parse comment
+	user_comment=$(
+		echo "$json_string" |
+			jq -r '
             .prompt, (.models[] | "<lora:\(.modelFileName) :\(.weight)>."),
             "Negative prompt:", .negativePrompt + ".",
             "Steps: " + (.steps | tostring) +
@@ -49,17 +49,17 @@ for png in "${files[@]}"; do
             ", Seed: " + (.seed | tostring) +
             ", Model: " + (.baseModel.modelFileName | tostring) +
             ", Clip Skip: " + (.clipSkip | tostring) + ", Civitai resources:"
-    ')
-    
-    # set user comment
-    parsedModelInfo=$(echo "$models" | jq -r -c '[.[] | select(.type == "LORA") | select(.poi == false) | {type, modelVersionId}]')
-    
-    exiv2 -M "set Exif.Photo.UserComment $user_comment $parsedModelInfo" "$jpg"
-    
+    '
+	)
+
+	# set user comment
+	parsedModelInfo=$(echo "$models" | jq -r -c '[.[] | select(.type == "LORA") | select(.poi == false) | {type, modelVersionId}]')
+
+	exiv2 -M "set Exif.Photo.UserComment $user_comment $parsedModelInfo" "$jpg"
+
 done
 
-echo "Processing complete, Updated ${#files[@]} files."
-
+echo -e "\nAll ${#files[@]} files updated.\n"
 
 # move jpg to another target_dir
 # jpgs=("$target_dir"/*.jpg)
@@ -67,8 +67,6 @@ echo "Processing complete, Updated ${#files[@]} files."
 # for jpg in "${jpgs[@]}"; do
 #     mv "$jpg" "$target_dir"/jpg
 # done
-
-
 
 # make slides
 # read -rp "Make slides? (Y/n)" confirm
@@ -80,10 +78,8 @@ echo "Processing complete, Updated ${#files[@]} files."
 
 # "$working_dir"/make-slides.sh "$1"
 
-
 pngs=("$target_dir"/*.png)
-mkdir "$target_dir"/png
-for png in "${pngs[@]}"
-do
-    mv "$png" "$target_dir"/png
+mkdir "$target_dir"/png 2>/dev/null
+for png in "${pngs[@]}"; do
+	mv "$png" "$target_dir"/png
 done
