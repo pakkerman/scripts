@@ -53,7 +53,7 @@ for png in "${files[@]}"; do
 	)
 
 	# set user comment
-	parsedModelInfo=$(echo "$models" | jq -r -c '[.[] | select(.type == "LORA") | select(.poi == false) | {type, modelVersionId}]')
+	parsedModelInfo=$(echo "$models" | jq -r -c '[.[] | select((.type == "LORA") or (.type == "Checkpoint")) | select(.poi == false) | {type, modelVersionId}]')
 
 	exiv2 -M "set Exif.Photo.UserComment $user_comment $parsedModelInfo" "$jpg"
 
