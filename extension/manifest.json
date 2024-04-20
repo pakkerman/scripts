@@ -12,7 +12,7 @@
 
   "content_scripts": [
     {
-      "matches": ["https://tusiart.com/*"],
+      "matches": ["https://tusi.cn/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

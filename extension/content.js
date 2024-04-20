@@ -4,6 +4,8 @@
 // buttons.filter(item => item.querySelector('span').textContent === '👍0').forEach(item=> item.click())
 // buttons.filter(item => item.querySelector('span').textContent === '❤️0').forEach(item=> item.click())
 
+const domain = "https://tusi.cn";
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`\naction: ${message.action} received\n`);
   switch (message.action) {
@@ -21,9 +23,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     case "createProject":
       const location = window.location.href;
-      if (location === "https://tusiart.com/new/project") {
+      if (location === `${domain}/new/project`) {
         createProject();
-      } else if (/https\:\/\/tusiart.com\/new\/model./.test(location)) {
+      } else if (/https\:\/\/tusi.cn\/new\/model./.test(location)) {
         createModel();
       }
       break;
@@ -180,7 +182,7 @@ function download() {
 }
 
 async function createProject() {
-  const id = await getIdFromClipboard();
+  const [id] = await getIdFromClipboard();
   if (isNaN(+id)) return;
 
   const res = await fetch(`https://civitai.com/api/v1/models/${id}`);
@@ -221,13 +223,15 @@ async function createProject() {
   const createButton = document.querySelector(
     ".vi-button.vi-button--size-medium.vi-button--type-primary",
   );
+
   createButton.click();
 }
 
 async function createModel() {
   const [id, versionId] = await getIdFromClipboard();
-  if (isNaN(+id)) return;
+  console.log("with id:", id);
 
+  if (isNaN(+id)) return;
   let target = `https://civitai.com/api/v1/models/${id}`;
   if (versionId) {
     target = `https://civitai.com/api/v1/model-versions/${versionId}`;
