@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+echo $SHELL
 
 SCRIPT="$1"
 # Function to execute the script

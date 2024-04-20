@@ -8,3 +8,5 @@
 - [ ] grab the necessary info from the images
 
 - [ ] exiv2 back to converted jpg files
+
+- [ ] add neg embedding to the resources list
