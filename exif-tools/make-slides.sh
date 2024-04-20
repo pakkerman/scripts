@@ -23,10 +23,18 @@ ffmpeg -y -framerate 2 -i "$input" -c:v libx264 -preset slow -crf 22 -pix_fmt yu
 #   :fontfile=/Users/pakk/Library/Fonts/RobotoMono-Light.ttf
 #   :fontsize=48
 #   :box=1
-#   :boxcolor=black@0.5
-#   :boxborderw=5
-#   :x=(w-text_w)-10
-#   :y=th-10
+#   :boxcolor=black@0.6
+#   :boxborderw=10
+#   :x=(w-text_w)-50
+#   :y=th
+# " -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
+
+
+# a box indicator
+# ffmpeg -y -framerate 2 -i "$input" \
+# -vf \
+# "
+# drawgrid=width=in_w:height=in_h:thickness=40:color=red@0.5
 # " -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
 
 echo "count $count"

@@ -69,11 +69,11 @@ echo -e "\nAll ${#files[@]} files updated.\n"
 # done
 
 # make slides
-# read -rp "Make slides? (Y/n)" confirm
+# read -rp "make slides? (y/n)" confirm
 # case "$confirm" in
-#     [yY] | [yY][eE][sS] | "" ) echo "Continuing (y)" ;;
-#     [nN] | [nN][oO]) echo "Canceled (n)" ; exit ;;
-#     *) echo "Invalid input."; exit ;;
+#     [yy] | [yy][ee][ss] | "" ) echo "continuing (y)" ;;
+#     [nn] | [nn][oo]) echo "canceled (n)" ; exit ;;
+#     *) echo "invalid input."; exit ;;
 # esac
 
 # "$working_dir"/make-slides.sh "$1"

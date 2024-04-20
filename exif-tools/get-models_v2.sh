@@ -16,10 +16,9 @@ filepath_json="$dir/cache/models.json"
 
 # If no file or file is empty, create and put an empty object into it
 if [ -z "$(jq '.' "$filepath_json")" ]; then
-    mkdir "$dir/cache"
-    echo "{}" > "$filepath_json"
+	mkdir "$dir/cache"
+	echo "{}" >"$filepath_json"
 fi
-
 
 # getting hashes
 user_comment=$(exiftool -b -UserComment "$file")
@@ -46,11 +45,7 @@ out=$(echo "$user_comment" | jq 'reduce .models[] as $item ({}; . + {
     }
 })' | jq '.')
 
-
-
 echo $out
-echo $out > log.json
-
 
 # parse hashes into array
 hash_values=($(echo "$json" | jq -r '.baseModel.hash, .lora[].hash'))
@@ -66,7 +61,6 @@ json_array=()
 # echo "$test"
 
 # echo "$test" | jq .> log.json
-
 
 # for hash_value in "${hash_values[@]}"; do
 #     model_info=$(echo $(cat "$filepath_json" | jq --arg key "$hash_value" '.[$key]' | jq '.'))
@@ -95,11 +89,7 @@ json_array=()
 
 # done
 
-
-
 # echo "${json_array[@]}" | jq -s -c '.'
-
-
 
 # civitai parsing needs type and id,
 # [{"type":"checkpoint","modelVersionId":132828},
