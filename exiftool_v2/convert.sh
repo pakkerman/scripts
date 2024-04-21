@@ -8,7 +8,6 @@ dir=$(dirname "$1")/$(basename "$1")/
 [[ ! -d "$dir" ]] && echo "invalid dir path" && exit 1
 
 # dir="$HOME/downloads/test/"
-#
 echo "$dir"
 
 # ./fetch_models.sh "$dir"
@@ -30,8 +29,7 @@ embed_data=$(jq --null-input '{
 
 count=0
 error=0
-error_files=()
-
+error_list=()
 for file in "${files[@]}"; do
 	((count++))
 	echo -ne "\r\033[K processing $(basename "$file") ($count / ${#files[@]})"
@@ -43,10 +41,9 @@ for file in "${files[@]}"; do
 	sampler=$(echo "$json" | jq -r .samplerName)
 	clipskip=$(echo "$json" | jq -r .clipSkip)
 	seed=$(echo "$json" | jq -r .seed)
-	CFG=$(echo "$json" | jq -r .cfgScale)
+	cfg=$(echo "$json" | jq -r .cfgScale)
 	steps=$(echo "$json" | jq -r .steps)
 	model_data=$(echo "$json" | jq '.baseModel' | jq -r '{name: .modelFileName, hash: .hash}')
-	# lora_data=$(echo "$json" | jq 'try [.models[], .adetailer.args[0].models[]] | map({type: .type, name: .modelFileName, hash: .hash, weight: .weight})')
 	lora_data=$(echo "$json" | jq ' try
       (if (.models | length) > 0 then .models else [] end) +
       (if (.adetailer.args[0].models | length) > 0 then .adetailer.args[0].models else [] end)
@@ -65,20 +62,20 @@ for file in "${files[@]}"; do
 
 	if [[ "$?" != 0 ]]; then
 		((error++))
-		error_files+=("$(basename "$file")")
+		error_list+=("$(basename "$file")")
 	fi
 
 	jpg=$(echo "$file" | sed 's/.png/.jpg/g')
 	convert "$file" -gravity South -chop 0x15 -quality 95 "$jpg"
 
-	metadata="$prompt,$lora_weights. Negative prompt: $negative. \nSteps: $steps, Sampler: $sampler, CFG scale: $CFG, Seed: $seed, Model: $(echo "$model_data" | jq -r '.name'), Clip Skip: $clipskip, Hashes: $hashes"
+	metadata="$prompt,$lora_weights. Negative prompt: $negative. \nSteps: $steps, Sampler: $sampler, CFG scale: $cfg, Seed: $seed, Model: $(echo "$model_data" | jq -r '.name'), Clip Skip: $clipskip, Hashes: $hashes"
 	exiv2 -M "set Exif.Photo.UserComment $metadata" "$jpg"
 
 done
 
 if [[ $error != 0 ]]; then
 	echo -e "\n\nThere was $error errors occurred with following files:"
-	echo -e "${error_files[@]}" | tr ' ' '\n'
+	echo -e "${error_list[@]}" | tr ' ' '\n'
 fi
 
 mkdir "$dir/png" 2>/dev/null
