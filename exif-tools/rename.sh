@@ -31,6 +31,6 @@ for d in "$1"/*; do
 	[[ "$d" =~ -posted$ ]] && continue
 	echo "$d"
 	RENAME "$d"
-	$(dirname "$0")/make-slides.sh "$d" &
+	$(dirname "$0")/make-slides.sh "$d"
 
 done

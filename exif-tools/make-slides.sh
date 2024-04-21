@@ -3,7 +3,6 @@
 
 [ ! -d "$1" ] && echo "Invalid input path" && exit 1
 
-
 dir=$(dirname "$1")
 base=$(basename "$1")
 input="$dir/$base/$base-%04d.jpg"
@@ -12,7 +11,13 @@ output="$dir/video-$base.mp4"
 count=$(find "$1" -type f -name "*.jpg" | grep -c "")
 
 # normal output
-ffmpeg -y -framerate 2 -i "$input" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
+ffmpeg -y \
+	-framerate 2 \
+	-i "$input" -c:v libx264 \
+	-preset slow -crf 22 \
+	-pix_fmt yuv420p \
+	-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" \
+	"$output"
 
 # output with slide number
 # ffmpeg -y -framerate 2 -i "$input" \
@@ -28,7 +33,6 @@ ffmpeg -y -framerate 2 -i "$input" -c:v libx264 -preset slow -crf 22 -pix_fmt yu
 #   :x=(w-text_w)-50
 #   :y=th
 # " -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p "$output"
-
 
 # a box indicator
 # ffmpeg -y -framerate 2 -i "$input" \
