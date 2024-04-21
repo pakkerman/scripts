@@ -1,19 +1,22 @@
 #!/bin/bash
 
-# dir="$1"
-# [[ ! -d "$dir" ]] && echo "invalid dir path" && exit 1
-
 # TODO: Add lora name and weights into prompt
 # BUG:  Find out why EMBED is marked as textural inversion
 # BUG:  Apparently some images will just be missing Generation Data to begin with, so there is nothing to parse and fail
 
-dir="$HOME/downloads/test/"
-mv "$dir/png"/*.png "$dir" 2>/dev/null
+dir=$(dirname "$1")/$(basename "$1")/
+[[ ! -d "$dir" ]] && echo "invalid dir path" && exit 1
+
+# dir="$HOME/downloads/test/"
+#
+echo "$dir"
 
 # ./fetch_models.sh "$dir"
 # models=$(cat ./cache/models.json)
 
 echo -e "\n Processing images... \n"
+
+mv "$dir/png"/*.png "$dir" 2>/dev/null
 
 files=($(echo "$dir"*.png | tr " " "\n"))
 
@@ -43,7 +46,11 @@ for file in "${files[@]}"; do
 	CFG=$(echo "$json" | jq -r .cfgScale)
 	steps=$(echo "$json" | jq -r .steps)
 	model_data=$(echo "$json" | jq '.baseModel' | jq -r '{name: .modelFileName, hash: .hash}')
-	lora_data=$(echo "$json" | jq 'try [.models[], .adetailer.args[0].models[]] | map({type: .type, name: .modelFileName, hash: .hash, weight: .weight})')
+	# lora_data=$(echo "$json" | jq 'try [.models[], .adetailer.args[0].models[]] | map({type: .type, name: .modelFileName, hash: .hash, weight: .weight})')
+	lora_data=$(echo "$json" | jq ' try
+      (if (.models | length) > 0 then .models else [] end) +
+      (if (.adetailer.args[0].models | length) > 0 then .adetailer.args[0].models else [] end)
+      | map({type: .type, name: .modelFileName, hash: .hash, weight: .weight}) ')
 	lora_weights=$(echo "$lora_data" | jq -r '.[] | "<" + .name + ":" + (.weight | tostring) + ">,"')
 
 	hashes=$(
@@ -53,7 +60,7 @@ for file in "${files[@]}"; do
 			--argjson embed_data "$embed_data" \
 			'. + { "model": $model_hash.hash } +
 	        reduce $lora_hashes[] as $item ({}; .["\($item.type):\($item.name)"] = $item.hash) +
-            ($embed_data | with_entries(.key |= tostring))' 2>/dev/null
+            ($embed_data | with_entries(.key |= tostring))'
 	)
 
 	if [[ "$?" != 0 ]]; then
