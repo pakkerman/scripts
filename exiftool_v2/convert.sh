@@ -6,12 +6,16 @@
 # TODO: Add lora name and weights into prompt
 # BUG:  Find out why EMBED is marked as textural inversion
 # BUG:  Apparently some images will just be missing Generation Data to begin with, so there is nothing to parse and fail
-dir="$HOME/downloads/test/"
-# ./fetch_models.sh "$dir"
 
-mv "$dir/png"/*.png "$dir"
+dir="$HOME/downloads/test/"
+mv "$dir/png"/*.png "$dir" 2>/dev/null
+
+# ./fetch_models.sh "$dir"
+# models=$(cat ./cache/models.json)
+
+echo -e "\n Processing images... \n"
+
 files=($(echo "$dir"*.png | tr " " "\n"))
-models=$(cat ./cache/models.json)
 
 embed_data=$(jq --null-input '{
     "EMBED: FastNegativeV2": "A7465E7CC2A2A27571EE020053F307B5AF54E6B60A0B0235D773F6BD55F7D078",
@@ -24,11 +28,14 @@ embed_data=$(jq --null-input '{
 count=0
 error=0
 error_files=()
+
 for file in "${files[@]}"; do
 	((count++))
+	echo -ne "\r\033[K processing $(basename "$file") ($count / ${#files[@]})"
 
 	json=$(exiftool "$file" | grep "Generation data" | sed "s/.*{\"models\"/{\"models\"/" | jq -r .)
 	prompt=$(echo "$json" | jq -r .prompt | sed -E "s/\\n//g")
+	adetailer_prompt=$(echo "$json" | jq -r '.adetailer.args[0].adPrompt')
 	negative=$(echo "$json" | jq -r .negativePrompt)
 	sampler=$(echo "$json" | jq -r .samplerName)
 	clipskip=$(echo "$json" | jq -r .clipSkip)
@@ -36,7 +43,8 @@ for file in "${files[@]}"; do
 	CFG=$(echo "$json" | jq -r .cfgScale)
 	steps=$(echo "$json" | jq -r .steps)
 	model_data=$(echo "$json" | jq '.baseModel' | jq -r '{name: .modelFileName, hash: .hash}')
-	lora_data=$(echo "$json" | jq 'try [.models[], .adetailer.args[0].models[]] | map({type: .type, name: .modelFileName, hash: .hash})')
+	lora_data=$(echo "$json" | jq 'try [.models[], .adetailer.args[0].models[]] | map({type: .type, name: .modelFileName, hash: .hash, weight: .weight})')
+	lora_weights=$(echo "$lora_data" | jq -r '.[] | "<" + .name + ":" + (.weight | tostring) + ">,"')
 
 	hashes=$(
 		jq --null-input -c \
@@ -45,7 +53,7 @@ for file in "${files[@]}"; do
 			--argjson embed_data "$embed_data" \
 			'. + { "model": $model_hash.hash } +
 	        reduce $lora_hashes[] as $item ({}; .["\($item.type):\($item.name)"] = $item.hash) +
-	        ($embed_data | with_entries(.key |= tostring))'
+            ($embed_data | with_entries(.key |= tostring))' 2>/dev/null
 	)
 
 	if [[ "$?" != 0 ]]; then
@@ -56,27 +64,15 @@ for file in "${files[@]}"; do
 	jpg=$(echo "$file" | sed 's/.png/.jpg/g')
 	convert "$file" -gravity South -chop 0x15 -quality 95 "$jpg"
 
-	metadata="$prompt. Negative prompt: $negative. \nSteps: $steps, Sampler: $sampler, CFG scale: $CFG, Seed: $seed, Model: $(echo "$model_data" | jq -r '.name'), Clip Skip: $clipskip, Hashes: $hashes"
+	metadata="$prompt,$lora_weights. Negative prompt: $negative. \nSteps: $steps, Sampler: $sampler, CFG scale: $CFG, Seed: $seed, Model: $(echo "$model_data" | jq -r '.name'), Clip Skip: $clipskip, Hashes: $hashes"
 	exiv2 -M "set Exif.Photo.UserComment $metadata" "$jpg"
 
-	echo -ne "\r\033[K processing $(basename "$file") ($count / ${#files[@]})"
 done
 
-echo -e "\nThere was $error errors occurred with following files:"
-echo -e "${error_files[@]}"
+if [[ $error != 0 ]]; then
+	echo -e "\n\nThere was $error errors occurred with following files:"
+	echo -e "${error_files[@]}" | tr ' ' '\n'
+fi
 
 mkdir "$dir/png" 2>/dev/null
 mv "$dir"/*.png "$dir/png"
-
-# IFS=$'\n'
-# for hash in $hashes; do
-# 	model=$(curl "https://civitai.com/api/v/model-versions/by-hash/$hash")
-# 	echo "$model" | jq .model.name
-#
-# done
-
-# comment=$(exiftool -b -Parameters $file)
-# convert -gravity South -chop 0x30 -quality 95 "$file" "/Users/pakk/Downloads/new/out.jpg"
-# exiv2 -M "set Exif.Photo.UserComment $comment" "/Users/pakk/Downloads/new/out.jpg"
-
-# exiftool -UserComment "/Users/pakk/Downloads/new/out.jpg"
