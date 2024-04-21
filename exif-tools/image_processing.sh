@@ -12,33 +12,36 @@ process() {
 
 	convert "$input" -unsharp 0x1+1+0 "$output"
 	endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 1>/dev/null
+	filmgrain -a 100 -A 80 -d 100 -D 100 -c softlight -C softlight "$output" "$output"
 	# filmgrain -a 75 -A 75 "$output" "$output"
 	# filmgrain -a 50 -A 33 -n multiplicative "$output" "$output"
-	filmgrain -a 100 -A 80 -d 100 -D 100 -c softlight -C softlight "$output" "$output"
 
 	convert "$output" -quality 90 "$output"
-	echo "$(basename "$1") processed"
 }
 
-[[ ! -d $1 ]] && echo "invalid directory" && exit
+dir=$(dirname "$1")/$(basename "$1")/
+[[ ! -d $dir ]] && echo "invalid directory" && exit
 [[ -n $2 ]] && echo "enter something to process"
 
-echo -e "--- Post Processing Images --- \n"
+echo -e "\n --- Image Post Processing --- \n"
 
-bak_path="$1/bak"
+bak_path="$dir/bak"
 mkdir -p "$bak_path"
 
-mv "$bak_path"/*.jpg "$1"
-cp "$1"/*.jpg "$bak_path"
+mv "$bak_path"/*.jpg "$dir" 2>/dev/null
+cp "$dir"/*.jpg "$bak_path"
 
-files=("$1"/*.jpg)
+files=("$dir"/*.jpg)
 count=0
 
 for file in "${files[@]}"; do
+	((count++))
+	echo -ne "\r\033[K Processing $(basename "$file") ($count / ${#files[@]})"
 	process "$file" "$file"
 done
 
 end=$(date +%s)
 elapsed=$((end - start))
 
-echo -e "Files processed: ${#files[@]}, finished in $elapsed seconds"
+echo -ne "\r\033[K Done in $elapsed seconds\n"
+echo -e " Files processed: ${#files[@]}"
