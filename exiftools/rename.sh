@@ -7,6 +7,7 @@ echo -e "\n----- Renaming $0 -----\n"
 
 RENAME() {
 	dir=$1
+
 	i=0
 	for path in "$dir"/*.jpg; do
 		[[ ! -f $path ]] && continue
@@ -26,11 +27,24 @@ RENAME() {
 	done
 }
 
-for d in "$1"/*; do
-	[[ ! -d "$d" ]] && continue
-	[[ "$d" =~ -posted$ ]] && continue
-	echo "$d"
-	RENAME "$d"
-	$(dirname "$0")/make-slides.sh "$d"
+i=0
+base=$(basename "$1")
+for dir in "$1"*/; do
+
+	[[ "$dir" =~ -posted$ ]] && continue
+
+	((i++))
+	mv "$dir" "$1/$base-$(printf "%02d" $i)"
+done
+
+for dir in "$1"*/; do
+
+	RENAME "$dir"
+
+done
+
+for dir in "$1"*/; do
+
+	./make-slides.sh "$dir"
 
 done

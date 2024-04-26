@@ -25,7 +25,7 @@ for png in "${files[@]}"; do
 
 	# convert to jpg and crop bottom 30px to get rid of the watermark
 	jpg="${png%.*}.jpg"
-	convert "$png" -gravity South -chop 0x30 -quality 95 "$jpg"
+	convert "$png" -gravity South -chop 0x15 -quality 95 "$jpg"
 	# convert "$png" -quality 95 "$jpg"
 
 	# Civitai.com API, model lookup

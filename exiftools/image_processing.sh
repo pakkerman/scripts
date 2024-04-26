@@ -10,13 +10,13 @@ process() {
 	input=$1
 	output=$2
 
-	convert "$input" -unsharp 0x1+1+0 "$output"
-	endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 1>/dev/null
-	filmgrain -a 100 -A 80 -d 100 -D 100 -c softlight -C softlight "$output" "$output"
+	# convert "$input" -unsharp 0x1+0.5+0 "$output"
+	endpoints -l 5,15 -h 250,245 -c all "$input" "$output" 1>/dev/null
+	filmgrain -a 90 -A 80 -d 90 -D 90 -c softlight -C softlight "$output" "$output"
 	# filmgrain -a 75 -A 75 "$output" "$output"
 	# filmgrain -a 50 -A 33 -n multiplicative "$output" "$output"
 
-	convert "$output" -quality 90 "$output"
+	convert "$output" -quality 92 "$output"
 }
 
 dir=$(dirname "$1")/$(basename "$1")/
