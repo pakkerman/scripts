@@ -3,48 +3,72 @@
 
 [[ ! -d $1 ]] && echo "Valid path to directory required." && exit 1
 
-echo -e "\n----- Renaming $0 -----\n"
+target_path=$1
+# target_path=/users/pakk/downloads/test/
+
+echo -e "\n----- Renaming -----\n\n"
+read -rp "Use original name? (enter new name or leave empty): " name
+
+if [[ "$name" == '' ]]; then
+	name=$(basename "$target_path")
+	echo -e "continuing with: $name\n"
+fi
+
+rename_path=$(dirname "$target_path")/$name
+mv "$target_path" "$rename_path" 2>/dev/null
+target_path=$rename_path
 
 RENAME() {
-	dir=$1
+	target=$1
+	echo "Rename contents of $target"
 
 	i=0
-	for path in "$dir"/*.jpg; do
-		[[ ! -f $path ]] && continue
+	for item in "$target"/*; do
 		((i++))
-		mv "$path" "$(dirname "$path")/$(printf temp-%04d "$i").jpg"
+
+		unset ext
+		if [[ -f $item ]]; then
+			ext=${item##*.}
+		fi
+
+		to="$(dirname "$item")/temp-$(printf "%04d" $i)${ext:+.$ext}"
+		mv "$item" "$to"
 	done
 
 	i=0
-	for path in "$dir"/*.jpg; do
-		[[ ! -f $path ]] && continue
-
+	for item in "$target"/*; do
 		((i++))
-		from=$path
-		to="$dir/$(basename "$dir")-$(printf %04d "$i").jpg"
 
-		mv "$from" "$to"
+		indexing=$(printf "%02d" $i)
+		unset ext
+		if [[ -f $item ]]; then
+			indexing=$(printf "%04d" $i)
+			ext=${item##*.}
+		fi
+
+		dir=$(dirname "$item")
+		prefix=$(basename "$(dirname "$item")")
+		to="$dir/$prefix-$indexing${ext:+.$ext}"
+		mv "$item" "$to"
 	done
 }
 
-i=0
-base=$(basename "$1")
-for dir in "$1"*/; do
+RENAME "$target_path"
+
+echo "$target_path/*"
+
+for dir in "$target_path"/*; do
 
 	[[ "$dir" =~ -posted$ ]] && continue
-
-	((i++))
-	mv "$dir" "$1/$base-$(printf "%02d" $i)"
-done
-
-for dir in "$1"*/; do
 
 	RENAME "$dir"
 
 done
 
-for dir in "$1"*/; do
+for dir in "$target_path"/*; do
 
-	./make-slides.sh "$dir"
+	echo "$dir"
+
+	./make-slides.sh "$dir" &
 
 done
