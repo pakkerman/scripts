@@ -38,7 +38,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 function clickGenerate() {
   document.querySelectorAll("button").forEach((item) =>
     item.querySelectorAll("*").forEach((subitem) => {
-      if (subitem?.textContent === "在线生成") subitem.click();
+      if (subitem?.textContent === "Generate") subitem.click();
     }),
   );
 }
