@@ -69,7 +69,6 @@ for dir in "$target_path"/*/; do
 
 		ext=${item##*.}
 		to="$(dirname "$item")/temp-$(printf "%04d" $k)${ext:+.$ext}"
-		echo "$to"
 		mv "$item" "$to"
 	done
 
@@ -79,7 +78,6 @@ for dir in "$target_path"/*/; do
 
 		ext=${item##*.}
 		to="$(dirname "$item")/$(basename "$dir")-$(printf "%04d" $k)${ext:+.$ext}"
-		echo "$to"
 		mv "$item" "$to"
 	done
 done
