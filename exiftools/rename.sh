@@ -67,8 +67,6 @@ done
 
 for dir in "$target_path"/*; do
 
-	echo "$dir"
-
 	./make-slides.sh "$dir" &
 
 done
