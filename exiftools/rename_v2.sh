@@ -1,6 +1,7 @@
 #!/bin/bash
 # This script will take a dir and serialize all sub-dir jpg files
 
+echo -e "\ndir from rename v2 $1"
 [[ ! -d $1 ]] && echo "Valid path to directory required." && exit 1
 
 target_path=$1
@@ -81,3 +82,11 @@ for dir in "$target_path"/*/; do
 		mv "$item" "$to"
 	done
 done
+
+for item in "$target_path"/*/; do
+	[[ $item =~ "posted" ]] && continue
+
+	./make-slides.sh "$item"
+done
+
+echo "$(dirname "$1")/$name"
