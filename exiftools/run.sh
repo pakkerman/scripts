@@ -1,31 +1,68 @@
 #!/bin/bash
 
+[[ ! -d "$1" ]] && echo "Invalid directory" && exit 1
+input_dir=$1
 
-[ -z "$1" ] && echo "Invalid directory" && exit 1
+clear
 
-target="$1"
+function menu() {
 
+	[[ ! -d "$1" ]] && echo "Invalid directory" && exit 1
+	dir=$1
 
+	while true; do
 
-dir="$(dirname "$0")"
-echo "$dir"
+		echo -e "\n --- Generated Image Toolkit --- \n"
+		echo -e "   Current target: $dir"
+		echo -e "   Pick an operation:"
+		echo -e "\t1) Convert Images"
+		echo -e "\t2) Rename Images"
+		echo -e "\t3) Post-porcess Images"
+		echo -e "\t4) Sort Images"
+		echo -e "\t5) Target subdirectory\n"
 
-# rename files
-"$dir"/renamePNGs.sh "$target"
-# "$dir"/rename.sh "$target/"
+		read -rp "   Enter your choice (1-5): " option
 
-# conver file to jpg
-# echo "Converting to jpg via imagemagick"
-# for png in "$target"/*.png; do
-#     jpg="${png%.*}.jpg"
-#     magick "$png" "$jpg"
-#     echo "$(basename "$png") >>> $(basename "$jpg")"
-# done
-# echo
+		case $option in
+		1)
+			echo "Selected convert images"
+			de
+			../exiftool_v2/convert.sh "$dir"
+			;;
+		2)
+			echo "Selected rename images"
+			dir=$(./rename_v2.sh "$dir")
+			dir=$(echo "$dir" | tail -n 1)
+			;;
+		3)
+			echo "Selected image processing"
+			./image_processing.sh "$dir"
+			;;
+		4)
+			echo "Sort images (with text-similarity)"
+			read -rp "choose K: (default 3) " K
+			bun /Users/pakk/Dropbox/Coding/text-similarity/src/index.ts -p "$dir" -c "${K:-3}"
 
-# # get model info
-# for jpg in "$target"/*jpg; do
-#     echo "$jpg"
-# done
+			break
+			;;
+		5)
+			subdirs=$(find "$input_dir" -type d)
+			choice=$(echo "$subdirs" | fzf)
 
-# # done
+			clear
+
+			echo -e "\n you have chosen $choice as the target"
+			menu "$choice"
+
+			break
+			;;
+		*)
+			echo "Invalid option. Please enter a number between 1 and 5."
+			;;
+		esac
+
+		clear
+	done
+}
+
+menu "$input_dir"
