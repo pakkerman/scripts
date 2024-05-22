@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["https://tusi.cn/*"],
-      "js": ["content.js"],
+      "js": ["content.js", "init.js"],
       "run_at": "document_idle"
     }
   ],
