@@ -6,10 +6,26 @@
 
 const domain = "https://tusi.cn";
 
+document.addEventListener("keypress", (event) => {
+  console.log(event.key);
+
+  if (event.key === "¡") {
+    // alt + 1
+    changeBatchSize(1);
+  } else if (event.key === "™") {
+    // alt + 2
+    changeBatchSize(2);
+  } else if (event.key === "£") {
+    // alt + 3
+    changeBatchSize(3);
+  }
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(`\naction: ${message.action} received\n`);
   switch (message.action) {
     case "run":
+      updateLayout();
       run();
       break;
 
@@ -58,10 +74,19 @@ const ADtailerFields = {
   models: ["face_yolov8n_v2.pt", "DPM++ SDE Karras"],
 };
 
-function run() {
+function updateLayout() {
   hideViolationSpan();
+}
+
+function changeBatchSize(num) {
+  document.querySelectorAll(".n-select.w-60")[0].querySelector("div").click();
+  sleep(300);
+
+  document.querySelectorAll("div.flex-c-sb.w-100")[num].click();
+}
+
+function run() {
   addEventToDeleteButton();
-  expendTextAreas();
 
   const pane = document.querySelectorAll('.n-tab-pane:not([class*=" "])');
   let selectedPane = "";
@@ -143,11 +168,6 @@ function hideViolationSpan() {
   });
 }
 
-function expendTextAreas() {
-  const textareas = [...document.querySelectorAll("textarea")];
-  textareas.forEach((item) => (item.rows = 15));
-}
-
 const confirmButtonObserver = new MutationObserver(() => {
   const elements = document.querySelectorAll("span.n-button__content");
   elements[1].click();
@@ -168,17 +188,27 @@ function addEventToDeleteButton() {
   });
 }
 
-function download() {
-  console.log("clicked download");
+async function download() {
+  console.log("Download trigger");
+
+  // sent mouseenter to trigger hover to show download button
+  document
+    .querySelectorAll(
+      "div.thumbnail-image.relative.w-full.h-full.overflow-hidden",
+    )
+    .forEach((item) => item.dispatchEvent(new Event("mouseenter")));
+
+  await sleep(1000);
+  // click buttons
   const items = document.querySelectorAll(
     "[icon-id=download]:not(.vi-button__icon__size)",
   );
-  items.forEach((item, idx) => {
-    setTimeout(() => {
-      item.click();
-      console.log(`downloading: ${idx + 1} / ${items.length}`);
-    }, 500 * idx);
-  });
+
+  for (let i = 0; i < items.length; i++) {
+    console.log(`downloading: ${i + 1} / ${items.length}`);
+    items[i].click();
+    await sleep(500);
+  }
 }
 
 async function createProject() {
