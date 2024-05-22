@@ -12,7 +12,7 @@ process() {
 
 	# convert "$input" -unsharp 0x1+0.5+0 "$output"
 	endpoints -l 5,15 -h 250,245 -c all "$input" "$output" 1>/dev/null
-	filmgrain -a 90 -A 80 -d 90 -D 90 -c softlight -C softlight "$output" "$output"
+	filmgrain -a 95 -A 95 -d 95 -D 95 -c softlight -C softlight "$output" "$output"
 	# filmgrain -a 75 -A 75 "$output" "$output"
 	# filmgrain -a 50 -A 33 -n multiplicative "$output" "$output"
 
