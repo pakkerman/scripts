@@ -1,7 +1,7 @@
 #! /bin/bash
 # This program will take in a path and make slides with the png files inside.
 
-[ ! -d "$1" ] && echo "Invalid input path" && exit 1
+[[ ! -d "$1" ]] && echo "Invalid input path" && exit 1
 
 dir=$(dirname "$1")
 base=$(basename "$1")
