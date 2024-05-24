@@ -1,72 +1,92 @@
 #!/bin/bash
 # This script will take a dir and serialize all sub-dir jpg files
 
+echo -e "\ndir from rename v2 $1"
 [[ ! -d $1 ]] && echo "Valid path to directory required." && exit 1
 
 target_path=$1
+target_base=$(basename "$target_path")
+
 # target_path=/users/pakk/downloads/test/
 
-echo -e "\n----- Renaming -----\n\n"
-read -rp "Use original name? (enter new name or leave empty): " name
+echo -e "\n----- Renaming -----\n"
+echo -e "Use original name ""$target_base""?"
+read -rp "(enter new name or leave empty): " name
 
 if [[ "$name" == '' ]]; then
 	name=$(basename "$target_path")
 	echo -e "continuing with: $name\n"
 fi
 
-rename_path=$(dirname "$target_path")/$name
-mv "$target_path" "$rename_path" 2>/dev/null
-target_path=$rename_path
+if [[ $name != "$target_base" ]]; then
+	echo "$name"
+	destination=$(dirname "$target_path")/$name
+	if [[ -d $destination ]]; then
+		echo "destination dir alread exist."
+		exit 1
+	fi
+	mv -n "$target_path" "$destination"
+	target_path=$destination
+fi
 
-RENAME() {
-	target=$1
-	echo "Rename contents of $target"
+# Rename dirs to temp
+i=0
+for item in "$target_path"/*/; do
+	((i++))
 
-	i=0
-	for item in "$target"/*; do
-		((i++))
+	to="$(dirname "$item")/temp-$(printf "%04d" $i)${ext:+.$ext}"
 
-		unset ext
-		if [[ -f $item ]]; then
-			ext=${item##*.}
-		fi
+	if [[ $item =~ "posted" ]]; then
+		to=$(echo "$to-posted")
+	fi
 
-		to="$(dirname "$item")/temp-$(printf "%04d" $i)${ext:+.$ext}"
+	mv "$item" "$to"
+done
+
+# Rename dirs
+i=0
+for item in "$target_path"/*/; do
+	((i++))
+
+	to="$(dirname "$item")/$name-$(printf "%02d" $i)"
+	if [[ $item =~ "posted" ]]; then
+		to=$(echo "$to-posted")
+	fi
+
+	mv "$item" "$to"
+done
+
+# Rename files
+i=0
+for dir in "$target_path"/*/; do
+	((i++))
+	if [[ $dir =~ "posted" ]]; then
+		continue
+	fi
+
+	k=0
+	for item in "$dir"/*; do
+		((k++))
+
+		ext=${item##*.}
+		to="$(dirname "$item")/temp-$(printf "%04d" $k)${ext:+.$ext}"
 		mv "$item" "$to"
 	done
 
-	i=0
-	for item in "$target"/*; do
-		((i++))
+	k=0
+	for item in "$dir"/*; do
+		((k++))
 
-		indexing=$(printf "%02d" $i)
-		unset ext
-		if [[ -f $item ]]; then
-			indexing=$(printf "%04d" $i)
-			ext=${item##*.}
-		fi
-
-		dir=$(dirname "$item")
-		prefix=$(basename "$(dirname "$item")")
-		to="$dir/$prefix-$indexing${ext:+.$ext}"
+		ext=${item##*.}
+		to="$(dirname "$item")/$(basename "$dir")-$(printf "%04d" $k)${ext:+.$ext}"
 		mv "$item" "$to"
 	done
-}
-
-RENAME "$target_path"
-
-echo "$target_path/*"
-
-for dir in "$target_path"/*; do
-
-	[[ "$dir" =~ -posted$ ]] && continue
-
-	RENAME "$dir"
-
 done
 
-for dir in "$target_path"/*; do
+for item in "$target_path"/*/; do
+	[[ $item =~ "posted" ]] && continue
 
-	./make-slides.sh "$dir" &
-
+	./make-slides.sh "$item"
 done
+
+echo "$(dirname "$1")/$name"

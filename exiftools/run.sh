@@ -23,6 +23,8 @@ function menu() {
 
 		read -rp "   Enter your choice (1-5): " option
 
+		clear
+
 		case $option in
 		1)
 			echo "Selected convert images"
@@ -31,7 +33,7 @@ function menu() {
 			;;
 		2)
 			echo "Selected rename images"
-			dir=$(./rename_v2.sh "$dir")
+			dir=$(./rename.sh "$dir")
 			dir=$(echo "$dir" | tail -n 1)
 			;;
 		3)
@@ -61,7 +63,6 @@ function menu() {
 			;;
 		esac
 
-		clear
 	done
 }
 
