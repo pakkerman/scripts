@@ -9,16 +9,20 @@ process_image() {
 	input=$1
 	output=$1
 
-	convert "$input" -unsharp 0x1+0.5+0 "$output"
+	magick "$input" -unsharp 0x1+0.5+0 "$output"
+	# convert "$input" -unsharp 0x1+0.5+0 "$output"
 	# less contrast
 	# endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 2>/dev/null
-	# more contrast
-	endpoints -l 15,5 -h 245,250 -c all "$output" "$output" 2>/dev/null
-	filmgrain -a 95 -A 95 -d 95 -D 95 -c softlight -C softlight "$output" "$output" 2>/dev/null
 
-	# convert "$input" -unsharp 0x1+0.5+0 "$output"
-	# endpoints -l 10,0 -h 250,255 -c all "$output" "$output" 1>/dev/null
-	# filmgrain -a 75 -A 75 -d 75 -D 75 -c softlight -C softlight "$output" "$output"
+	# more desaturated
+	endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 1>/dev/null
+	# more contrast
+	# endpoints -l 15,5 -h 245,250 -c all "$output" "$output" 2>/dev/null
+
+	# less dense grain for smaller size image
+	filmgrain -a 75 -A 75 -d 75 -D 75 -c softlight -C softlight "$output" "$output" 2>/dev/null
+	# more dense grain for large size image
+	# filmgrain -a 95 -A 95 -d 95 -D 95 -c softlight -C softlight "$output" "$output" 2>/dev/null
 
 	magick "$output" -quality 96 "$output" 2>/dev/null
 }
