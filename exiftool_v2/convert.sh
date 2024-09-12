@@ -66,9 +66,18 @@ for file in "${files[@]}"; do
 	fi
 
 	jpg=$(echo "$file" | sed 's/.png/.jpg/g')
-	convert "$file" -gravity South -chop 0x15 -quality 95 "$jpg"
+	magick "$file" \
+		-encoding UTF-16 \
+		-endian LSB \
+		-gravity South \
+		-chop 0x15 \
+		-quality 95 "$jpg"
 
 	metadata="$prompt,$lora_weights. Negative prompt: $negative. \nSteps: $steps, Sampler: $sampler, CFG scale: $cfg, Seed: $seed, Model: $(echo "$model_data" | jq -r '.name'), Clip Skip: $clipskip, Hashes: $hashes"
+
+	# utf16be_comment=$(echo -n "$metadata" | iconv -f UTF-8 -t UTF-16)
+	# echo -n "$utf16be_comment" >comment.bin
+	#
 	exiv2 -M "set Exif.Photo.UserComment $metadata" "$jpg"
 
 done
