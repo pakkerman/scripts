@@ -19,7 +19,8 @@ function menu() {
 		echo -e "\t2) Rename Images"
 		echo -e "\t3) Post-porcess Images"
 		echo -e "\t4) Sort Images"
-		echo -e "\t5) Target subdirectory\n"
+		echo -e "\t5) Target subdirectory"
+		echo -e "\t6) Add watermark\n"
 
 		read -rp "   Enter your choice (1-5): " option
 
@@ -28,8 +29,7 @@ function menu() {
 		case $option in
 		1)
 			echo "Selected convert images"
-			de
-			../exiftool_v2/convert.sh "$dir"
+			../exiftool_v2/convert_tensorart.sh "$dir"
 			;;
 		2)
 			echo "Selected rename images"
@@ -56,6 +56,12 @@ function menu() {
 			echo -e "\n you have chosen $choice as the target"
 			menu "$choice"
 
+			break
+			;;
+
+		6)
+			echo "Add watermark"
+			./add_watermark.sh "$dir"
 			break
 			;;
 		*)
