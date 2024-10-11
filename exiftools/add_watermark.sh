@@ -21,7 +21,9 @@ output="$dir/video-$base.mp4"
 # echo "count $count"
 
 for video in "$dir/$base"/*.mp4; do
-	ffmpeg -i "$video" \
+	ffmpeg \
+		-loglevel warning \
+		-i "$video" \
 		-i "$watermark" \
 		-filter_complex "overlay=W-w-10:H-h-10" \
 		"${video%.mp4}_watermarked.mp4"

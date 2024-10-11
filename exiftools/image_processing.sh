@@ -15,7 +15,7 @@ process_image() {
 	# endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 2>/dev/null
 
 	# more desaturated
-	endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 1>/dev/null
+	endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 2>/dev/null
 	# more contrast
 	# endpoints -l 15,5 -h 245,250 -c all "$output" "$output" 2>/dev/null
 

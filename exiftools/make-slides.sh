@@ -12,6 +12,7 @@ count=$(find "$1" -type f -name "*.jpg" | grep -c "")
 
 # normal output
 ffmpeg \
+	-loglevel warning \
 	-y \
 	-framerate 1.2 \
 	-i "$input" -c:v libx264 \
