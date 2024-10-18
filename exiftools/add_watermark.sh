@@ -21,10 +21,22 @@ output="$dir/video-$base.mp4"
 # echo "count $count"
 
 for video in "$dir/$base"/*.mp4; do
+
+	if [[ "$video" == *"watermark"* ]]; then
+		continue
+	fi
+
+	original="${video%.mp4}.mp4"
+	temp="${video%.mp4}_watermarked.mp4"
+
 	ffmpeg \
 		-loglevel warning \
+		-y \
 		-i "$video" \
 		-i "$watermark" \
 		-filter_complex "overlay=W-w-10:H-h-10" \
-		"${video%.mp4}_watermarked.mp4"
+		"$temp"
+
+	rm "$original"
+	mv "$temp" "$original"
 done
