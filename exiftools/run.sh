@@ -20,9 +20,10 @@ function menu() {
 		echo -e "\t3) Post-porcess Images"
 		echo -e "\t4) Sort Images"
 		echo -e "\t5) Target subdirectory"
-		echo -e "\t6) Add watermark\n"
+		echo -e "\t6) Add watermark"
+		echo -e "\t7) Crop images to 1:2 ratio\n"
 
-		read -rp "   Enter your choice (1-5): " option
+		read -rp "   Enter your choice (1-6): " option
 
 		clear
 
@@ -62,7 +63,11 @@ function menu() {
 		6)
 			echo "Add watermark"
 			./add_watermark.sh "$dir"
-			break
+			;;
+
+		7)
+			echo "Crop to 1:2 ratio"
+			./crop.sh "$dir"
 			;;
 		*)
 			echo "Invalid option. Please enter a number between 1 and 5."
