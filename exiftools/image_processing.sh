@@ -10,22 +10,31 @@ process_image() {
 	output=$1
 
 	magick "$input" -unsharp 0x1+0.5+0 "$output"
+	saturation 1.1 "$output" "$output"
 	# convert "$input" -unsharp 0x1+0.5+0 "$output"
+	#
 	# less contrast
-	# endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 2>/dev/null
+	# endpoints -l 5,15 -h 250,245 -c all "$output" "$output"
 
 	# more desaturated
-	endpoints -l 5,15 -h 250,245 -c all "$output" "$output" 2>/dev/null
+	# endpoints -l 5,15 -h 250,245 -c all "$output" "$output"
 	# more contrast
-	# endpoints -l 15,5 -h 245,250 -c all "$output" "$output" 2>/dev/null
+	endpoints -l 15,5 -h 245,250 -c all "$output" "$output"
+	# Lot more contrast
+	# endpoints -l 30,5 -h 225,250 "$output" "$output"
+
+	# tinting pass
+	endpoints -l 0,5 -h 250,255 -c r "$output" "$output"
+	endpoints -l 0,5 -h 250,255 -c b "$output" "$output"
+	# endpoints -l 10,0 -h 255,245 -c g "$output" "$output"
 
 	# less dense grain for smaller size image
-	filmgrain -a 75 -A 75 -d 75 -D 75 -c softlight -C softlight "$output" "$output" 2>/dev/null
+	# filmgrain -a 50 -A 50 -d 50 -D 50 -c softlight -C softlight "$output" "$output"
+	filmgrain -a 75 -A 75 -d 75 -D 75 -c softlight -C softlight "$output" "$output"
 	# more dense grain for large size image
-	# filmgrain -a 95 -A 95 -d 95 -D 95 -c softlight -C softlight "$output" "$output" 2>/dev/null
-
-	magick "$output" -quality 96 "$output" 2>/dev/null
-}
+	# filmgrain -a 90 -A 90 -d 90 -D 90 -c softlight -C softlight "$output" "$output"
+	magick "$output" -quality 96 "$output"
+} 1>/dev/null 2>/dev/null
 
 dir=$(dirname "$1")/$(basename "$1")/
 [[ ! -d $dir ]] && echo "invalid directory" && exit
@@ -33,7 +42,7 @@ dir=$(dirname "$1")/$(basename "$1")/
 
 echo -e "\n --- Image Post Processing --- \n"
 
-bak_path="$dir"bak
+bak_path="$dir"processing_bak
 mkdir -p "$bak_path"
 
 # enable glob extension
@@ -46,8 +55,8 @@ files=("$dir"/*.*(jpg|jpeg))
 
 # Use parallel
 export -f process_image
-time parallel \
-	--progress \
+parallel \
+	--bar \
 	--jobs 8 \
 	--delay 0.1 \
 	process_image {} ::: "${files[@]}"
