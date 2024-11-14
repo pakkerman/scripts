@@ -42,7 +42,7 @@ dir=$(dirname "$1")/$(basename "$1")/
 
 echo -e "\n --- Image Post Processing --- \n"
 
-bak_path="$dir"processing_bak
+bak_path="$dir"bak_process
 mkdir -p "$bak_path"
 
 # enable glob extension

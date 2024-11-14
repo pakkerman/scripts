@@ -12,3 +12,4 @@ test.*
 # exif-tools
 
 *.bak
+tmp.*
