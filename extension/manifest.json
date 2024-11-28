@@ -12,7 +12,7 @@
 
   "content_scripts": [
     {
-      "matches": ["https://tusi.cn/*"],
+      "matches": ["https://tusiart.com/*", "https://tensor.art/settings"],
       "js": ["content.js", "init.js"],
       "run_at": "document_idle"
     }

@@ -26,10 +26,10 @@ process_image() {
 	# tinting pass
 	endpoints -l 0,5 -h 250,255 -c r "$output" "$output"
 	endpoints -l 0,5 -h 250,255 -c b "$output" "$output"
-	# endpoints -l 10,0 -h 255,245 -c g "$output" "$output"
+	# endpoints -l 5,0 -h 255,250 -c g "$output" "$output"
 
 	# less dense grain for smaller size image
-	# filmgrain -a 50 -A 50 -d 50 -D 50 -c softlight -C softlight "$output" "$output"
+	filmgrain -a 50 -A 50 -d 50 -D 50 -c softlight -C softlight "$output" "$output"
 	filmgrain -a 75 -A 75 -d 75 -D 75 -c softlight -C softlight "$output" "$output"
 	# more dense grain for large size image
 	# filmgrain -a 90 -A 90 -d 90 -D 90 -c softlight -C softlight "$output" "$output"

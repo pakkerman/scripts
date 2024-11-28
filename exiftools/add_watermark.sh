@@ -9,17 +9,6 @@ input="$dir/$base/$base-%04d.jpg"
 watermark="$HOME/Documents/.generation/watermark.png"
 output="$dir/video-$base.mp4"
 
-# count=$(find "$1" -type f -name "*.jpg" | grep -c "")
-
-# normal output
-# ffmpeg \
-# 	-i "$input" -c:v libx264 \
-# 	-i "$watermark" \
-# 	-filter_complex "overlay=W-w-10:H-h-10" \
-# 	"$output"
-#
-# echo "count $count"
-
 for video in "$dir/$base"/*.mp4; do
 
 	if [[ "$video" == *"watermark"* ]]; then
@@ -35,6 +24,10 @@ for video in "$dir/$base"/*.mp4; do
 		-i "$video" \
 		-i "$watermark" \
 		-filter_complex "overlay=W-w-10:H-h-10" \
+		-c:v libx264 \
+		-crf 16 \
+		-preset slow \
+		-c:a copy \
 		"$temp"
 
 	rm "$original"

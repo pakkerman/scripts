@@ -4,7 +4,7 @@
 // buttons.filter(item => item.querySelector('span').textContent === '👍0').forEach(item=> item.click())
 // buttons.filter(item => item.querySelector('span').textContent === '❤️0').forEach(item=> item.click())
 
-const domain = "https://tusi.cn";
+const domain = "https://tensor.art";
 
 document.addEventListener("keypress", (event) => {
   console.log(event.key);
@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const location = window.location.href;
       if (location === `${domain}/new/project`) {
         createProject();
-      } else if (/https\:\/\/tusi.cn\/new\/model./.test(location)) {
+      } else if (/https\:\/\/tensor.art\/new\/model./.test(location)) {
         createModel();
       }
       break;

@@ -5,6 +5,17 @@ if (window.location.href.includes("settings")) {
 }
 
 async function init() {
+  console.log("init");
+  setInterval(() => {
+    // Remove Mask
+    console.log("ran remove mask");
+    document
+      .querySelectorAll(
+        "div.absolute.top-0.left-0.w-full.h-full.p-12.flex.flex-col.items-center.justify-center.c-text-secondary.z-2.bg-bg-on-secondary.gap-8",
+      )
+      .forEach((item) => console.log(item.classList.remove("absolute")));
+  }, 1000);
+
   await sleep(1000);
   openPanel();
 

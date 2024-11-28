@@ -83,6 +83,15 @@ for dir in "$target_path"/*/; do
 	done
 done
 
+# Use parallel,
+# Little bit faster at the cost of making machine extremely laggy.
+# parallel \
+# 	--bar \
+# 	--jobs 2 \
+# 	--delay 0.1 \
+# 	./make-slides.sh {} ::: "$target_path"/*/
+
+# Original for loop version
 for item in "$target_path"/*/; do
 	[[ $item =~ "posted" ]] && continue
 

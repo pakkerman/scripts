@@ -6,7 +6,7 @@
 dir=$(dirname "$1")
 base=$(basename "$1")
 input="$dir/$base/$base-%04d.jpg"
-output="$dir/video-$base.mp4"
+output="$dir/slides-$base.mp4"
 
 count=$(find "$1" -type f -name "*.jpg" | grep -c "")
 
@@ -16,7 +16,7 @@ ffmpeg \
 	-y \
 	-framerate 1.2 \
 	-i "$input" -c:v libx264 \
-	-preset slow -crf 22 \
+	-preset slow -crf 16 \
 	-pix_fmt yuv420p \
 	-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" \
 	"$output"
