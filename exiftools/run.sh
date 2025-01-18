@@ -1,80 +1,87 @@
 #!/bin/bash
 
 [[ ! -d "$1" ]] && echo "Invalid directory" && exit 1
-input_dir=$1
+input_dir="$(cd ~/Downloads/test/ && pwd -P)/"
+root=$(dirname "$0")
 
 clear
 
 function menu() {
 
-	[[ ! -d "$1" ]] && echo "Invalid directory" && exit 1
-	dir=$1
+  [[ ! -d "$1" ]] && echo "Invalid directory" && exit 1
+  dir=$1
 
-	while true; do
+  while true; do
 
-		echo -e "\n --- Generated Image Toolkit --- \n"
-		echo -e "   Current target: $dir"
-		echo -e "   Pick an operation:"
-		echo -e "\t1) Convert Images"
-		echo -e "\t2) Rename Images"
-		echo -e "\t3) Post-porcess Images"
-		echo -e "\t4) Sort Images"
-		echo -e "\t5) Target subdirectory"
-		echo -e "\t6) Add watermark"
-		echo -e "\t7) Crop images to 1:2 ratio\n"
+    echo -e "\n --- Generated Image Toolkit --- \n"
+    echo -e "   Current target: $dir"
+    echo -e "   Pick an operation:"
+    echo -e "\t1) Convert Images"
+    echo -e "\t2) Rename Images"
+    echo -e "\t3) Post-porcess Images"
+    echo -e "\t4) Sort Images"
+    echo -e "\t5) Target subdirectory"
+    echo -e "\t6) Add watermark"
+    echo -e "\t7) Crop images to 1:2 ratio"
+    echo -e "\t8) Translate Civitai metadata\n"
+    read -rp "   Enter a number: " option
 
-		read -rp "   Enter your choice (1-6): " option
+    clear
 
-		clear
+    case $option in
+    1)
+      echo "Selected convert images"
+      "$root"/../exiftool_v2/convert_tensorart.sh "$dir"
+      ;;
+    2)
+      echo "Selected rename images"
+      dir=$(./rename.sh "$dir")
+      dir=$(echo "$dir" | tail -n 1)
+      ;;
+    3)
+      echo "Selected image processing"
+      "$root"/image_processing.sh "$dir"
+      ;;
+    4)
+      echo "Sort images (with text-similarity)"
+      read -rp "choose K: (default 3) " K
+      bun "$HOME"/git/prompt-similarity-grouping/src/index.ts -p "$dir" -c "${K:-3}"
 
-		case $option in
-		1)
-			echo "Selected convert images"
-			../exiftool_v2/convert_tensorart.sh "$dir"
-			;;
-		2)
-			echo "Selected rename images"
-			dir=$(./rename.sh "$dir")
-			dir=$(echo "$dir" | tail -n 1)
-			;;
-		3)
-			echo "Selected image processing"
-			./image_processing.sh "$dir"
-			;;
-		4)
-			echo "Sort images (with text-similarity)"
-			read -rp "choose K: (default 3) " K
-			bun /Users/pakk/Dropbox/Coding/text-similarity/src/index.ts -p "$dir" -c "${K:-3}"
+      ;;
+    5)
+      subdirs=$(find "$input_dir" -type d)
+      choice=$(echo "$subdirs" | fzf)
 
-			break
-			;;
-		5)
-			subdirs=$(find "$input_dir" -type d)
-			choice=$(echo "$subdirs" | fzf)
+      clear
 
-			clear
+      echo -e "\n you have chosen $choice as the target"
+      menu "$choice"
 
-			echo -e "\n you have chosen $choice as the target"
-			menu "$choice"
+      break
+      ;;
 
-			break
-			;;
+    6)
+      echo "Add watermark"
+      "$root"/add_watermark.sh "$dir"
+      ;;
 
-		6)
-			echo "Add watermark"
-			./add_watermark.sh "$dir"
-			;;
+    7)
+      echo "Crop to 1:2 ratio"
+      "$root"/crop.sh "$dir"
+      ;;
 
-		7)
-			echo "Crop to 1:2 ratio"
-			./crop.sh "$dir"
-			;;
-		*)
-			echo "Invalid option. Please enter a number between 1 and 5."
-			;;
-		esac
+    8)
+      echo "Translate Civitai metadata"
+      parallel "$root"/civitai-translator.sh {} ::: "$dir"/*
+      ;;
 
-	done
+    *)
+
+      echo "Invalid option. Please enter a number"
+      ;;
+    esac
+
+  done
 }
 
 menu "$input_dir"
