@@ -7,37 +7,30 @@ const filteredJsonData = jsonData.filter(
 );
 
 let output = "";
-const count = filteredJsonData.length;
-let currCount = 0;
-filteredJsonData.forEach(async (data) => {
-  try {
-    const { modelVersionId, weight } = data;
-    const res = await fetch(
-      `https://civitai.com/api/v1/model-versions/${modelVersionId}/`,
-    );
-    const json = await res.json();
-    const name = json.files[0].name.replace(".safetensors", "");
-    output += `<lora:${name}:${weight}>,\n`;
-    currCount++;
-  } catch (error) {
-    console.log(error);
-  }
-  await sleep(100);
+await main();
+console.log(output);
 
-  if (currCount === count) {
-    console.log(output);
+async function main() {
+  for (const data of filteredJsonData) {
+    output += await parse(data);
+    await sleep(100);
   }
-});
 
-// "<lora:" +
-// modelFileName.replace(".safetensors", "") +
-// ":" +
-// ressource.weight +
-// ">, #" +
-// url +
-// " #" +
-// modelName +
-// "\n ";
+  async function parse(data) {
+    try {
+      const { modelVersionId, weight } = data;
+      const res = await fetch(
+        `https://civitai.com/api/v1/model-versions/${modelVersionId}/`,
+      );
+      const json = await res.json();
+      const name = json.files[0].name.replace(".safetensors", "");
+      return `\n<lora:${name}:${weight}>,`;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

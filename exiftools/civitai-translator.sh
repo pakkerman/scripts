@@ -1,9 +1,9 @@
-#/bin/bash
+#!/bin/bash
 
-filepath=$1
-dir=$(dirname $filepath)
-base=$(basename $filepath)
-parsed_filepath="$dir/$(basename "parsed-${filepath%.*}").${filepath##*.}"
+filepath="$1"
+dir=$(dirname "$filepath")
+base=$(basename "$filepath")
+parsed_filepath="$dir/parsed-$(basename "${filepath%.*}").${filepath##*.}"
 
 data=$(exiftool -UserComment -b "$filepath")
 
@@ -13,11 +13,14 @@ metadata=$(echo $data | sed -e 's/.*Steps/Steps/' | sed 's/Created Date:.*, Civi
 models=$(echo $data | sed 's/.*Civitai resources: //' | sed 's/, Civitai metadata: {}//')
 models_json=$(echo $models | jq -c .)
 
-prompt+=$(echo $(node ./civitai-model-parse.js "$models_json"))
-output=$(echo "$prompt \nNegative prompt: $neg \n$metadata")
+prompt+=$(node ./civitai-model-parse.js "$models_json")
+echo "$prompt"
+output="$prompt 
+Negative prompt: $neg 
+$metadata"
 
 # echo "$prompt \nNegative prompt: $neg \n$metadata"
 
-cp "$filepath" "$parsed_filepath"
-
-exiftool -UserComment="$output" "$parsed_filepath"
+exiftool -UserComment="$output" "$filepath"
+mv "$filepath" "$parsed_filepath"
+mv "$filepath"_original "$filepath"
