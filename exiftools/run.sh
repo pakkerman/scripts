@@ -1,7 +1,7 @@
 #!/bin/bash
 
 [[ ! -d "$1" ]] && echo "Invalid directory" && exit 1
-input_dir="$(cd ~/Downloads/test/ && pwd -P)/"
+input_dir="$(cd "$1" && pwd -P)/"
 root=$(dirname "$0")
 
 clear
@@ -35,7 +35,7 @@ function menu() {
       ;;
     2)
       echo "Selected rename images"
-      dir=$(./rename.sh "$dir")
+      dir=$("$root"/rename.sh "$dir")
       dir=$(echo "$dir" | tail -n 1)
       ;;
     3)
