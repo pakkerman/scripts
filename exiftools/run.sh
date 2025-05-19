@@ -23,7 +23,8 @@ function menu() {
     echo -e "\t5) Target subdirectory"
     echo -e "\t6) Add watermark"
     echo -e "\t7) Crop images to 1:2 ratio"
-    echo -e "\t8) Translate Civitai metadata\n"
+    echo -e "\t8) Crop images to 9:16 ratio"
+    echo -e "\t9) Translate Civitai metadata\n"
     read -rp "   Enter a number: " option
 
     clear
@@ -67,10 +68,15 @@ function menu() {
 
     7)
       echo "Crop to 1:2 ratio"
-      "$root"/crop.sh "$dir"
+      "$root"/crop1to2.sh "$dir"
       ;;
 
     8)
+      echo "Crop to 9:16 ratio"
+      "$root"/crop9to16.sh "$dir"
+      ;;
+
+    9)
       echo "Translate Civitai metadata"
       parallel "$root"/civitai-translator.sh {} ::: "$dir"/*
       ;;
