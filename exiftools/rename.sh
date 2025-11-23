@@ -1,102 +1,81 @@
-#!/bin/bash
-# This script will take a dir and serialize all sub-dir jpg files
+#!/usr/bin/env bash
 
-echo -e "\ndir from rename v2 $1"
-[[ ! -d $1 ]] && echo "Valid path to directory required." && exit 1
+# rename subdirectories
+# get new subdirectories
+# go into each subdirectories
+# rename all files to temp
+# get renamed files
+# rename all files
 
-root=$(dirname "$0")
-target_path=$1
-target_base=$(basename "$target_path")
+SCRIPT_DIR=${BASH_SOURCE%/*}
+source "$SCRIPT_DIR"/lib/utils.sh
 
-# target_path=/users/pakk/downloads/test/
+rename_subdirs() {
+  local dir="$1"
+  local subdirs=("$dir"/*)
+  rename_to_tmp "${subdirs[@]}"
 
-echo -e "\n----- Renaming -----\n"
-echo -e "Use original name ""$target_base""?"
-read -rp "(enter new name or leave empty): " name
+  local idx=0 file_idx
+  for subdir in "$dir"/*; do
 
-if [[ "$name" == '' ]]; then
-  name=$(basename "$target_path")
-  echo -e "continuing with: $name\n"
-fi
+    ((idx++))
+    file_idx=$(printf '%02d' "$idx")
+    dname=${subdir%/*}
 
-if [[ $name != "$target_base" ]]; then
-  echo "$name"
-  destination=$(dirname "$target_path")/$name
-  if [[ -d $destination ]]; then
-    echo "destination dir alread exist."
-    exit 1
-  fi
-  mv -n "$target_path" "$destination"
-  target_path=$destination
-fi
+    echo -e "\t\tdname: ${dname##*/}"
+    echo -e "\t\tdname: $dname/${dname##*/}-$file_idx"
 
-# Rename dirs to temp
-i=0
-for item in "$target_path"/*/; do
-  ((i++))
-
-  to="$(dirname "$item")/temp-$(printf "%04d" $i)${ext:+.$ext}"
-
-  if [[ $item =~ "posted" ]]; then
-    to=$(echo "$to-posted")
-  fi
-
-  mv "$item" "$to"
-done
-
-# Rename dirs
-i=0
-for item in "$target_path"/*/; do
-  ((i++))
-
-  to="$(dirname "$item")/$name-$(printf "%02d" $i)"
-  if [[ $item =~ "posted" ]]; then
-    to=$(echo "$to-posted")
-  fi
-
-  mv "$item" "$to"
-done
-
-# Rename files
-i=0
-for dir in "$target_path"/*/; do
-  ((i++))
-  if [[ $dir =~ "posted" ]]; then
-    continue
-  fi
-
-  k=0
-  for item in "$dir"/*; do
-    ((k++))
-
-    ext=${item##*.}
-    to="$(dirname "$item")/temp-$(printf "%04d" $k)${ext:+.$ext}"
-    mv "$item" "$to"
+    mv "$subdir" "$dname/${dname##*/}-$file_idx"
   done
 
-  k=0
-  for item in "$dir"/*; do
-    ((k++))
+}
 
-    ext=${item##*.}
-    to="$(dirname "$item")/$(basename "$dir")-$(printf "%04d" $k)${ext:+.$ext}"
-    mv "$item" "$to"
+rename_to_tmp() {
+
+  echo "> renaming to tmp..."
+
+  for item in "$@"; do
+    local dname=${item%/*}
+    local bname=${item##*/}
+
+    mv "$item" "$dname/tmp_$bname"
+
   done
-done
+}
 
-# Use parallel,
-# Little bit faster at the cost of making machine extremely laggy.
-# parallel \
-# 	--bar \
-# 	--jobs 2 \
-# 	--delay 0.1 \
-# 	./make-slides.sh {} ::: "$target_path"/*/
+rename_files() {
+  echo "> renaming files..."
+  local dir="$1"
+  for subdir in "$dir"/*; do
 
-# Original for loop version
-for item in "$target_path"/*/; do
-  [[ $item =~ "posted" ]] && continue
+    files=("$subdir"/*.webp)
+    rename_to_tmp "${files[@]}"
 
-  "$root"/make-slides.sh "$item"
-done
+    local prefix=${subdir##*/}
+    local idx=0 file_idx dname bname
+    for file in "$subdir"/*.webp; do
+      ((idx++))
+      file_idx=$(printf '%02d' "$idx")
+      dname=${file%/*}
+      bname=${file##*/tmp_}
+      ext=${file##*.}
 
-echo "$(dirname "$1")/$name"
+      mv "$file" "$dname/$prefix-$file_idx.$ext"
+
+    done
+
+  done
+
+}
+
+rename() {
+  echo "Selected rename images"
+  shopt -s extglob
+
+  DIR="$1"
+  [[ ! -d "$DIR" ]] && fatal "Invalid directory"
+
+  rename_subdirs "$DIR"
+  rename_files "$DIR"
+
+}
