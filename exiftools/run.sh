@@ -5,6 +5,7 @@ source "$SCRIPT_DIR"/lib/tui.sh
 source "$SCRIPT_DIR"/lib/utils.sh
 source "$SCRIPT_DIR"/rename.sh
 source "$SCRIPT_DIR"/image-processing.sh
+source "$SCRIPT_DIR"/make-video.sh
 
 main() {
   shopt -s globstar nullglob
@@ -25,7 +26,7 @@ main() {
 
     print-bottom-line "Current target: ${#files[@]} files in ~${target_dir/Users\/????\//} " 0
     echo -e "\tPick an operation:"
-    echo -e "\t\t1) Convert Images"
+    echo -e "\t\t1) Encode video"
     echo -e "\t\t2) Rename Images"
     echo -e "\t\t3) Post-porcess Images"
     echo -e "\t\t4) Sort Images"
@@ -36,13 +37,10 @@ main() {
     echo -e "\t\t9) Translate Civitai metadata\n"
     read -rp "        Enter option: " option
 
-    clear
+    # clear
 
     case $option in
-    1)
-      echo "Selected convert images"
-      "$script_dir"/../exiftool_v2/convert_tensorart.sh "$target_dir"
-      ;;
+    1) make_video "$target_dir" ;;
     2) rename "$target_dir" ;;
     3) image-processing "$target_dir" ;;
     4)
@@ -86,5 +84,5 @@ main() {
   done
 }
 
-clear
+# clear
 main "$@"
