@@ -15,7 +15,7 @@ function process-videos() {
     local files=(./*.webm)
     ((vid_counter += "${#files[@]}"))
 
-    parallel --jobs 1 ~/Downloads/scripts/encode_video.sh {} ::: *.webm
+    parallel --jobs 1 ~/git/scripts/ComfyUI_tools/encode_video.sh {} ::: *.webm
 
     [[ ! -d webm/ ]] && mkdir webm
     local webms=(./*.webm)
@@ -23,7 +23,10 @@ function process-videos() {
 
     local timeout=$TIMEOUT
     while [[ "$timeout" -ge 0 ]]; do
+      printf '\e[s'
+      printf '\e[%dB' $LINES
       printf '\e[30;43;1;3m     %s video processed, re-run in %d seconds      \e[0m\r' $vid_counter $timeout
+      printf '\e[u'
       sleep 1
       ((timeout--))
     done
@@ -38,8 +41,6 @@ function main() {
     *) ;;
     esac
   done
-
-  echo "timeout: $TIMEOUT"
 
   cd ~/Downloads/preview/ || exit 1
   shopt -s nullglob

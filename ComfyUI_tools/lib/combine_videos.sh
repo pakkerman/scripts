@@ -6,12 +6,13 @@
 for d in "$(pwd)"/*/; do
   cd "$d" || exit 1
 
-  [[ "$d" == *"posted_"* ]] && continue
+  [[ "$d" =~ "posted_" ]] && continue
+  [[ "$d" =~ "unsort_" ]] && continue
 
   name=$(basename "$d")
-  output_name="$name"_output
+  output_name="$name"_combined
 
-  rm ./*"_output"*.mp4
+  rm ./*"_combined"*.mp4
 
   if [[ -d "$d"/clips ]]; then
     mv "$d"/clips/*.mp4 "$d"
@@ -20,6 +21,12 @@ for d in "$(pwd)"/*/; do
   clips=("$d"/*.mp4)
 
   printf "file '$PWD/%s'\n" *.mp4 >list.txt
+
+  # TODO: Trim videos
+  # for f in *.mp4; do
+  #   printf "file '$PWD/%s'\ninpoint 00:00:01.000\noutpoint 00:00:03.000\n" "$f"
+  # done >list.txt
+
   ffmpeg -f concat -safe 0 -i list.txt -c copy "$output_name".mp4
 
   ffmpeg -f concat -safe 0 -i list.txt \
@@ -42,7 +49,6 @@ for d in "$(pwd)"/*/; do
 
   [[ ! -d "$d"/clips ]] && mkdir "$d"/clips
   mv "${clips[@]}" "$d"/clips
-  exit
 done
 
 cd ..

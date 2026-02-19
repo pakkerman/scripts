@@ -12,15 +12,15 @@ ffmpeg \
   hqdn3d=3:3:6:6,
   unsharp=luma_msize_x=3:luma_msize_y=3:luma_amount=1:chroma_msize_x=3:chroma_msize_y=3:chroma_amount=1,
   vignette=angle=PI/8,
-  noise=c0s=24:c0f=t+u,
-  gblur=sigma=0.6,
-  rgbashift=rh=-0.6:gh=0.6[v0];
+  noise=c0s=20:c0f=t+u,
+  gblur=sigma=0.4,
+  rgbashift=rh=-0.4:gh=0.4[v0];
   [v0][1:v]overlay=W-w-30:H-h-75,
   format=yuv420p[v]
   " \
   -map "[v]" \
   -c:v libx265 \
-  -crf 22 \
+  -crf 23 \
   -preset medium \
   -tune grain \
   -pix_fmt yuv420p \

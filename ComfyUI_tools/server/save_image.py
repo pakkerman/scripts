@@ -1,3 +1,5 @@
+# open local port to receive files from tempermonkey script
+
 import http.server
 import os
 
@@ -23,11 +25,15 @@ class SaveHandler(http.server.BaseHTTPRequestHandler):
         with open(os.path.join(SAVE_PATH, filename), 'wb') as f:
             f.write(data)
             
-        print(f"Saved: {filename}")
+        print(f"\033[33mSaved: {filename}, content_length: {content_length}\033[0m")
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
-print(f"Listening for images on port 6969... Saving to {SAVE_PATH}")
+
+pathname = "/".join(SAVE_PATH.split('/')[-2:])
+print(f"\033[30;43;1;3m Listening for images on port 6969... Saving to ~/{pathname} \033[0m")
+
 http.server.HTTPServer(('127.0.0.1', 6969), SaveHandler).serve_forever()
+
 
