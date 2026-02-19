@@ -3,7 +3,9 @@ const jsonData = JSON.parse(data);
 // filter out checkpoint and default loras embedded by Civitai
 const filteredJsonData = jsonData.filter(
   (item) =>
-    !item.modelName.match(/Civitai/g) && !item.type.match(/checkpoint/g),
+    !item.modelName.match(/Civitai/g) &&
+    !item.type.match(/checkpoint/g) &&
+    !item.type.match(/embed/g),
 );
 
 let output = "";

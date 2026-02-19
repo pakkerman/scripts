@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This program will take in a path and make slides with the png files inside.
 
 [[ ! -d "$1" ]] && echo "Invalid input path" && exit 1
@@ -14,11 +14,11 @@ count=$(find "$1" -type f -name "*.jpg" | grep -c "")
 ffmpeg \
   -loglevel warning \
   -y \
-  -framerate 1.2 \
+  -framerate 1.5 \
   -i "$input" -c:v libx264 \
   -preset slow -crf 16 \
   -pix_fmt yuv420p \
-  -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" \
+  -vf "scale='min(2560,iw)':'min(2560,ih)':force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2" \
   "$output"
 
 echo "count $count"

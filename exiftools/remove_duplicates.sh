@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 change_count=0
 

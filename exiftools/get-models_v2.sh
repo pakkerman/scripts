@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # this script is for getting model info from civitai api, using the hashes from the image
 # https://github.com/civitai/civitai/wiki/REST-API-Reference#get-apiv1models-versionsby-hashhash

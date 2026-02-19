@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # this script is to sent dev sever ip to phone using ntfy.sh
 # to use this create .env and set NTFY_TOPIC="your ntfy topic"

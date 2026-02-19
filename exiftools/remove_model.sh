@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 [[ ! -d $1 ]] && echo "invalid directory" && exit
 [[ -n $2 ]] && echo "enter something to remove"

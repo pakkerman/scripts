@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # TODO: Add lora name and weights into prompt
 # BUG:  Find out why EMBED is marked as textural inversion

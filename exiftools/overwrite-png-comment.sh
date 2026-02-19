@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This Script will get Parameter from a png using $exiftool -Parameters <file>
 # Then overwrite user comment with the same value, using exiv2,

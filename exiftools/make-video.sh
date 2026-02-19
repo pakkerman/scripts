@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-rename_files() {
+rename_clips() {
   # rename files to clip-##.mp4, with '_r' if matched in filename
-
   local dir=$1
   local tmp_path="$dir"/tmp
 
@@ -108,11 +107,13 @@ combine_clips() {
     -f lavfi -i anullsrc=cl=stereo:r=48000 \
     -loglevel info \
     -filter_complex "
-  [0:v]scale=1080:1920:flags=spline,
+  [0:v]scale=-1:1920:flags=spline,
   hqdn3d=3:3:6:6,
-  unsharp=luma_msize_x=5:luma_msize_y=5:luma_amount=1.5:chroma_msize_x=5:chroma_msize_y=5:chroma_amount=1.5,
-  noise=allf=t:alls=6, 
-  vignette=angle=PI/8[v0];
+  unsharp=luma_msize_x=3:luma_msize_y=3:luma_amount=1:chroma_msize_x=3:chroma_msize_y=3:chroma_amount=1,
+  vignette=angle=PI/9,
+  noise=c0s=28:c0f=t+u,
+  gblur=sigma=0.7,
+  rgbashift=rh=-0.8:gh=0.8[v0];
   [v0][1:v]overlay=W-w-30:H-h-75,format=yuv420p[v]
   " \
     -map "[v]" \
@@ -143,7 +144,7 @@ make_video() {
   rm "$dir"/_output.mp4 2>/dev/null
   rm -r "$dir"/trimmed 2>/dev/null
 
-  rename_files "$dir"
+  rename_clips "$dir"
   trim_clips "$dir"
   combine_clips "$dir"
 

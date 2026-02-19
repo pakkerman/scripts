@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 dir="$1"
 bak_path="$dir"bak_crop

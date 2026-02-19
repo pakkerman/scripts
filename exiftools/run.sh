@@ -40,14 +40,19 @@ main() {
     # clear
 
     case $option in
-    1) make_video "$target_dir" ;;
-    2) rename "$target_dir" ;;
-    3) image-processing "$target_dir" ;;
+    1)
+      make_video "$target_dir"
+      ;;
+    2)
+      rename "$target_dir"
+      ;;
+    3)
+      image-processing "$target_dir"
+      ;;
     4)
       echo "Sort images (with text-similarity)"
       read -rp "choose K: (default 3) " K
       bun "$HOME"/git/prompt-similarity-grouping/src/index.ts -p "$target_dir" -c "${K:-3}"
-
       ;;
     5)
       subdirs=$(find "$target_dir" -type d)
@@ -57,27 +62,18 @@ main() {
       main "$choice"
       break
       ;;
-
     6)
       echo "Add watermark"
       "$script_dir"/add_watermark.sh "$target_dir"
       ;;
-
     7)
       echo "Crop to 1:2 ratio"
       "$script_dir"/crop1to2.sh "$target_dir"
       ;;
-
     8)
       echo "Crop to 9:16 ratio"
       "$script_dir"/crop9to16.sh "$target_dir"
       ;;
-
-    9)
-      echo "Translate Civitai metadata"
-      parallel "$script_dir"/civitai-translator.sh {} ::: "$target_dir"/*
-      ;;
-
     *) echo "Invalid option. Please enter a number" ;;
     esac
 
