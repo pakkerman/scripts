@@ -4,6 +4,8 @@
 # from ~/Downloads/comfy_downloads to ~/Downloads/preview/
 
 TIMEOUT=180
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+ROOT=$(dirname "$SCRIPT_DIR")
 
 function process-videos() {
   local vid_counter=0
@@ -15,7 +17,7 @@ function process-videos() {
     local files=(./*.webm)
     ((vid_counter += "${#files[@]}"))
 
-    parallel --jobs 1 ~/git/scripts/ComfyUI_tools/encode_video.sh {} ::: *.webm
+    parallel --jobs 1 "$ROOT"/lib/encode_video.sh {} ::: *.webm
 
     [[ ! -d webm/ ]] && mkdir webm
     local webms=(./*.webm)
@@ -23,10 +25,13 @@ function process-videos() {
 
     local timeout=$TIMEOUT
     while [[ "$timeout" -ge 0 ]]; do
+      msg="$vid_counter vidoes processed, re-run in $timeout seconds"
+
       printf '\e[s'
       printf '\e[%dB' $LINES
-      printf '\e[30;43;1;3m     %s video processed, re-run in %d seconds      \e[0m\r' $vid_counter $timeout
+      printf '\e[30;43;1;3m     %s      \e[0m\r' "$msg"
       printf '\e[u'
+
       sleep 1
       ((timeout--))
     done
