@@ -1,9 +1,3 @@
 #!/usr/bin/env bash
-
-file="$1"
-jpg="${file%.*}out.png"
-magick "$file" -strip -quality 90 "$jpg"
-
-p=$(exiftool -Parameters -b "$file")
-exiftool -Parameters="$p" "$jpg"
-# exiv2 -M "set Exif.Photo.UserComment $p" "$jpg"
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+exec "$SCRIPT_DIR/metadata/convert-to-jpg.sh" "$@"
