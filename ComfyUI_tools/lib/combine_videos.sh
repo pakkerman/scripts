@@ -33,7 +33,7 @@ for d in "$(pwd)"/*/; do
     -filter_complex "[0:v]scale=1080:1920:flags=spline,setpts=0.8*PTS,fps=30[v]" \
     -map "[v]" \
     -c:v libx265 \
-    -crf 24 \
+    -crf 27 \
     -preset medium \
     -x265-params "repeat-headers=1" \
     -tune grain \

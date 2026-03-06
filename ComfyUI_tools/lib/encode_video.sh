@@ -20,7 +20,7 @@ ffmpeg \
   " \
   -map "[v]" \
   -c:v libx265 \
-  -crf 23 \
+  -crf 26 \
   -preset medium \
   -tune grain \
   -pix_fmt yuv420p \

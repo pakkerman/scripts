@@ -9,6 +9,8 @@ PYTHON_PID=0
 MONITOR_PID=0
 
 function cleanup() {
+  clear
+
   echo -ne "\nTerminating..."
 
   if [[ $PYTHON_PID -ne 0 ]]; then
@@ -19,6 +21,7 @@ function cleanup() {
     kill "$MONITOR_PID" 2>/dev/null
   fi
   echo "Done."
+
   exit 0
 }
 
