@@ -9,6 +9,8 @@ source "$ROOT_DIR"/lib/ops/image-processing.sh
 source "$ROOT_DIR"/lib/ops/make-video.sh
 
 main() {
+  clear
+
   shopt -s globstar nullglob
   tui-init
 
@@ -23,10 +25,8 @@ main() {
       read -rp $"Target directory: " target_dir
     fi
 
-    local files=(./*.*)
-
-    print-bottom-line "Current target: ${#files[@]} files in ~${target_dir/Users\/????\//} " 0
-    echo -e "\tPick an operation:"
+    print-bottom-line "Current target: ~${target_dir/Users\/????\//}"
+    echo -e "       Pick an operation:"
     echo -e "\t\t1) Encode video"
     echo -e "\t\t2) Rename Images"
     echo -e "\t\t3) Post-porcess Images"
@@ -36,9 +36,7 @@ main() {
     echo -e "\t\t7) Crop images to 1:2 ratio"
     echo -e "\t\t8) Crop images to 9:16 ratio"
     echo -e "\t\t9) Translate Civitai metadata\n"
-    read -rp "        Enter option: " option
-
-    # clear
+    read -rp "      Enter option: " option
 
     case $option in
     1)
@@ -61,7 +59,6 @@ main() {
 
       echo -e "\n you have chosen $choice as the target"
       main "$choice"
-      break
       ;;
     6)
       echo "Add watermark"
