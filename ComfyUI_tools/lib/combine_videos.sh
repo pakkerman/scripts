@@ -20,32 +20,41 @@ for d in "$(pwd)"/*/; do
 
   clips=("$d"/*.mp4)
 
-  printf "file '$PWD/%s'\n" *.mp4 >list.txt
-
   # TODO: Trim videos
   # for f in *.mp4; do
   #   printf "file '$PWD/%s'\ninpoint 00:00:01.000\noutpoint 00:00:03.000\n" "$f"
   # done >list.txt
+  #
 
-  ffmpeg -f concat -safe 0 -i list.txt -c copy "$output_name".mp4
+  input_args=()
+  filter=""
+  for i in "${!clips[@]}"; do
+    input_args+=(-i "${clips[$i]}")
+    filter+="[$i:v]scale=1080:1920:flags=spline,setsar=1,settb=AVTB,setpts=PTS-STARTPTS[v$i];"
+  done
 
-  ffmpeg -f concat -safe 0 -i list.txt \
-    -filter_complex "[0:v]scale=1080:1920:flags=spline,setpts=0.8*PTS,fps=30[v]" \
+  for i in "${!clips[@]}"; do
+    filter+="[v$i]"
+  done
+
+  filter+="concat=n=${#clips[@]}:v=1:a=0[v]"
+
+  # echo "$filter"
+
+  ffmpeg "${input_args[@]}" \
+    -filter_complex "$filter" \
     -map "[v]" \
+    -fps_mode vfr \
     -c:v libx265 \
-    -crf 27 \
+    -crf 25 \
     -preset medium \
     -x265-params "repeat-headers=1" \
     -tune grain \
     -pix_fmt yuv420p \
     -tag:v hvc1 \
     -level 4.1 \
-    -c:a aac -b:a 160k -ar 48000 -ac 2 \
-    -shortest \
     -movflags +faststart \
-    "$output_name"_30.mp4
-
-  rm list.txt
+    "$output_name".mp4
 
   [[ ! -d "$d"/clips ]] && mkdir "$d"/clips
   mv "${clips[@]}" "$d"/clips
