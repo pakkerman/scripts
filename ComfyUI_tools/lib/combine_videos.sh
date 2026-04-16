@@ -3,6 +3,10 @@
 # this script will start from a directory
 # goes into each sub-directory and combine all mp4s
 
+# Trim this many seconds from the start of each clip before concat.
+# Override with: TRIM_START=0.4 bash combine_videos.sh
+TRIM_START=0.5
+
 for d in "$(pwd)"/*/; do
   cd "$d" || exit 1
 
@@ -30,7 +34,7 @@ for d in "$(pwd)"/*/; do
   filter=""
   for i in "${!clips[@]}"; do
     input_args+=(-i "${clips[$i]}")
-    filter+="[$i:v]scale=1080:1920:flags=spline,setsar=1,settb=AVTB,setpts=PTS-STARTPTS[v$i];"
+    filter+="[$i:v]trim=start=${TRIM_START},scale=1080:1920:flags=spline,setsar=1,settb=AVTB,setpts=PTS-STARTPTS[v$i];"
   done
 
   for i in "${!clips[@]}"; do
