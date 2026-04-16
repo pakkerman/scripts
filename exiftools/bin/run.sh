@@ -21,9 +21,9 @@ main() {
 
     echo -e "\n --- Image Toolkit --- \n"
 
-    if [[ ! -d "$target_dir" ]]; then
-      read -rp $"Target directory: " target_dir
-    fi
+    while [[ ! -d "$target_dir" ]]; do
+      read -E -rp "Target directory: " target_dir
+    done
 
     print-bottom-line "Current target: ~${target_dir/Users\/????\//}"
     echo -e "       Pick an operation:"
@@ -36,7 +36,7 @@ main() {
     echo -e "\t\t7) Crop images to 1:2 ratio"
     echo -e "\t\t8) Crop images to 9:16 ratio"
     echo -e "\t\t9) Translate Civitai metadata\n"
-    read -rp "      Enter option: " option
+    read -E -rp "      Enter option: " option
 
     case $option in
     1)
@@ -64,19 +64,10 @@ main() {
       echo "Add watermark"
       "$tools_dir"/add_watermark.sh "$target_dir"
       ;;
-    7)
-      echo "Crop to 1:2 ratio"
-      "$tools_dir"/crop1to2.sh "$target_dir"
-      ;;
-    8)
-      echo "Crop to 9:16 ratio"
-      "$tools_dir"/crop9to16.sh "$target_dir"
-      ;;
     *) echo "Invalid option. Please enter a number" ;;
     esac
 
   done
 }
 
-# clear
 main "$@"
