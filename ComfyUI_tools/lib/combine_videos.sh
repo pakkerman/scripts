@@ -10,8 +10,8 @@ TRIM_START=0.5
 for d in "$(pwd)"/*/; do
   cd "$d" || exit 1
 
-  [[ "$d" =~ "posted_" ]] && continue
-  [[ "$d" =~ "unsort_" ]] && continue
+  [[ "$d" == *posted* ]] && continue
+  [[ "$d" == *unsort* ]] && continue
 
   name=$(basename "$d")
   output_name="$name"_combined
