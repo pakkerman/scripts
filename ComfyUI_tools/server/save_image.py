@@ -3,6 +3,8 @@
 import http.server
 import os
 import re
+import secrets
+
 
 # Where you want the images to be saved
 SAVE_PATH = "/Users/pakk/Downloads/comfy_downloads"
@@ -20,7 +22,13 @@ class SaveHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        filename = self.headers.get("X-Filename", "image.png")
+        target = self.headers.get("X-Filename", "image.png")
+
+        name = target.split(".")[0]
+        ext = target.split(".")[1]
+        name = re.sub(r"\d+_-_.*", "", name)
+
+        filename = name + secrets.token_hex(3) + "." + ext
 
         exclude_pattern = r"impact_seg_preview.*"
         if re.match(exclude_pattern, filename):

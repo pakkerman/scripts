@@ -46,7 +46,7 @@ process_image() {
     -a 96 -A 96 -d 96 -D 96 -c softlight -C softlight \
     "$tmp" "$tmp"
 
-  convert "$tmp" -quality 94 "$output"
+  convert "$tmp" -quality 80 "$output"
 
   rm "$tmp"
   # exiftool -ImageDescription="$image_description" -overwrite_original "$output" 1>/dev/null

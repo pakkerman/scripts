@@ -19,8 +19,8 @@ case "$corner" in
   ;;
 esac
 
-grain=18
-gaussian_blur=0.4
+grain=9
+gaussian_blur=0.2
 
 ffmpeg \
   -y \
