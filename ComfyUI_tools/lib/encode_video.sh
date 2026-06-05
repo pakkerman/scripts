@@ -19,7 +19,7 @@ case "$corner" in
   ;;
 esac
 
-grain=9
+grain=6
 gaussian_blur=0.2
 
 ffmpeg \
@@ -42,7 +42,7 @@ ffmpeg \
   " \
   -map "[v]" \
   -c:v libx265 \
-  -crf 26 \
+  -crf 24 \
   -preset slow \
   -tune grain \
   -pix_fmt yuv420p \
