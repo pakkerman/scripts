@@ -12,7 +12,7 @@ process_image() {
   local output="$bname.webp"
 
   # magick "$input" -resize 2160x3840\> -unsharp 0x1+1+0.05 "$tmp"
-  convert "$input" -resize 2160x3840\> "$tmp"
+  convert "$input" -resize 2160x3840^ -gravity center -extent 2160x3840 "$tmp"
   # saturation 1.1 "$tmp" "$tmp"
   # convert "$input" -unsharp 0x1+0.5+0 "$output"
   #
