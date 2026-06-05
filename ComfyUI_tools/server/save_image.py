@@ -28,7 +28,18 @@ class SaveHandler(http.server.BaseHTTPRequestHandler):
         ext = target.split(".")[1]
         name = re.sub(r"\d+_-_.*", "", name)
 
-        filename = name + secrets.token_hex(3) + "." + ext
+        filename = ""
+        if ext == "webp":
+            import time
+
+            time = str(time.time()).split(".")[0]
+            name = name.split("-")[0]
+            filename = f"{name}-{time}"
+
+        if ext == "webm":
+            filename = f"{name}-{secrets.token_hex(3)}"
+
+        filename += f".{ext}"
 
         exclude_pattern = r"impact_seg_preview.*"
         if re.match(exclude_pattern, filename):
@@ -36,6 +47,12 @@ class SaveHandler(http.server.BaseHTTPRequestHandler):
 
         content_length = int(self.headers["Content-Length"])
         data = self.rfile.read(content_length)
+
+        if content_length == 0:
+            print(
+                f"\033[31mInvalid file: {filename}, content_length: {content_length}, skipping...\033[0m"
+            )
+            return
 
         with open(os.path.join(SAVE_PATH, filename), "wb") as f:
             f.write(data)
