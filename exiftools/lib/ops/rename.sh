@@ -50,11 +50,12 @@ rename_images_in_subdirs() {
       local ext="${file##*.}"
       local file_idx=$(printf '%02d' "$idx")
 
-      mv -n "$file" "$subdir/.tmp_$file_idx.$ext"
+      mv -n "$file" "$subdir"/.tmp_"$file_idx"_img."$ext"
     done
 
     idx=0
     for file in "$subdir"*.mp4; do
+      [[ "$file" == *combine* ]] && continue
       [[ -f "$file" ]] || continue
 
       ((idx++))
@@ -62,9 +63,10 @@ rename_images_in_subdirs() {
       local ext="${file##*.}"
       local file_idx=$(printf '%02d' "$idx")
 
-      mv -n "$file" "$subdir/.tmp_$file_idx.$ext"
+      mv -n "$file" "$subdir"/.tmp_"$file_idx"_vid."$ext"
     done
 
+    # move all back out of tmp
     for tmpfile in "$subdir".tmp_*; do
       [[ -f "$tmpfile" ]] || continue
 
